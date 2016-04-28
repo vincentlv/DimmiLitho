@@ -248,7 +248,7 @@ if __name__ == '__main__' :
     print "Calculating ILT"
     i = RobustILT(m,t)
     i.image.resist_a = 100
-    i.image.resist_tRef = 0.6
+    i.image.resist_tRef = 0.2
     i.stepSize = 0.4
     i.image.doseList = [0.9,1,1.1]
     i.image.doseCoef = [0.3,1, 0.3]

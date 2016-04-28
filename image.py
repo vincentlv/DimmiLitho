@@ -8,18 +8,36 @@ NOTE: This is for Scalar Assumption, not Vector
 """
 
 import numpy as np
+import scipy.signal as sg
 
 class ImageHopkins:
     def __init__(self, mask, tcc):
         self.tcc = tcc               # TCC
         self.mask = mask             # Mask
         self.order = tcc.order       # TCC Order
-        self.resist_a = 80           # Resist model parameter: shapness
+        self.resist_a = 80           # Resist model parameter: sharpness
         self.resist_t = 0.6          # Resist model parameter: threshold
-        self.kernels = tcc.kernels   # Kerneks
+        self.kernels = tcc.kernels   # Kernels
         self.coefs = tcc.coefs       # Coefs
         
-    def calAI(self):        
+    def calAI(self):                 #much faster than calAIold()       
+        x1 = np.floor(self.mask.x_gridnum/2) - self.tcc.s.fnum
+        x2 = np.floor(self.mask.x_gridnum/2) + self.tcc.s.fnum  + 1
+        y1 = np.floor(self.mask.y_gridnum/2) - self.tcc.s.gnum 
+        y2 = np.floor(self.mask.y_gridnum/2) + self.tcc.s.gnum  + 1
+        
+        AI_freq_dense = np.zeros((self.mask.y_gridnum,self.mask.x_gridnum),dtype=np.complex)       
+        AI_freq_sparse = np.zeros((y2-y1,x2-x1),dtype=np.complex)       
+        for ii in range(self.order):
+            e_field = self.kernels[:,:,ii]*self.mask.fdata[y1:y2,x1:x2]
+            e_field_conj = np.conj(np.rot90(self.kernels[:,:,ii],2))*self.mask.fdata[y1:y2,x1:x2]
+            AA = sg.convolve2d(e_field, e_field_conj,'same','wrap')
+            AI_freq_sparse += self.coefs[ii]*AA     
+        AI_freq_dense[y1:y2,x1:x2] = AI_freq_sparse;
+        norm = self.mask.y_gridnum*self.mask.x_gridnum
+        self.AI = np.real(np.fft.fftshift(np.fft.ifft2(np.fft.ifftshift(AI_freq_dense))))/norm
+
+    def calAIold(self):         
         x1 = np.floor(self.mask.x_gridnum/2) - self.tcc.s.fnum
         x2 = np.floor(self.mask.x_gridnum/2) + self.tcc.s.fnum  + 1
         y1 = np.floor(self.mask.y_gridnum/2) - self.tcc.s.gnum 
@@ -75,9 +93,9 @@ if __name__ == "__main__":
        [[6, -1],[6, -2],[1, -2],[1, -3],[4, -3],[4, -6],[3, -6],[3, -4],[0, -4],[0, -1],[6, -1]] ]
     m = Mask()
     m.x_range = [-300.0,300.0]
-    m.y_range = [-300.0,300.0]
-    m.x_gridsize = 2.0
-    m.y_gridsize = 2.0
+    m.y_range = [-400.0,300.0]
+    m.x_gridsize = 1.0
+    m.y_gridsize = 1.0
     m.CD = 40
     m.polygons = mp
     m.poly2mask()

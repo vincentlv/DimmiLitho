@@ -5,6 +5,7 @@ Created on Sta Jun 28 2015
 import numpy as np
 from source import Source
 from lens import LensList
+import scipy as sci
 
 class TCC:
     def __init__(self,source,lens):
@@ -36,7 +37,8 @@ class TCC:
         tcc4d = self.tcc2d.reshape((self.gnum,self.fnum,self.gnum,self.fnum))
         tcc4df = np.fft.fftshift(np.fft.fftn(np.fft.ifftshift(tcc4d)))
         tcc2df = tcc4df.reshape((self.gnum*self.fnum,self.gnum*self.fnum))
-        U,S,V = np.linalg.svd(tcc2df)
+        # U,S,V = np.linalg.svd(tcc2df)
+        U,S,V = sci.sparse.linalg.svds(tcc2df, self.order) #faster than svd
         self.coefs = S[0:self.order]
         self.kernels = np.zeros((self.gnum,self.fnum,self.order),dtype = np.complex)
         for ii in range(self.order):
