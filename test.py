@@ -12,12 +12,11 @@ from ilt import RobustILT
 import numpy as np    
 import time
 
-a = time.time()
 
 m = Mask()
 m.x_gridsize = 2.5
 m.y_gridsize = 2.5
-m.openGDS('./NanGateLibGDS/NOR2_X2.gds',11,0.3)
+m.openGDS('./NanGateLibGDS/NOR2_X2.gds',layername=11,boundary=0.3)
 m.maskfft()
 
 
@@ -42,10 +41,12 @@ o.focusList = [0]
 o.focusCoef = [1]
 o.calculate()
 
+
+tic = time.time()
 print "Calculating TCC and SVD kernels"
-time.sleep(0.1)
 t = TCCList(s,o)
 t.calculate()
+print "###taking %1.3f seconds" %(time.time()-tic)
 
 
 print "Calculating ILT"

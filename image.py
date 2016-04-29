@@ -9,6 +9,7 @@ NOTE: This is for Scalar Assumption, not Vector
 
 import numpy as np
 import scipy.signal as sg
+import pyfftw
 
 class ImageHopkins:
     def __init__(self, mask, tcc):
@@ -19,34 +20,39 @@ class ImageHopkins:
         self.resist_t = 0.6          # Resist model parameter: threshold
         self.kernels = tcc.kernels   # Kernels
         self.coefs = tcc.coefs       # Coefs
+
+        self.norm = self.mask.y_gridnum*self.mask.x_gridnum
+        self.x1 = np.floor(self.mask.x_gridnum/2) - self.tcc.s.fnum
+        self.x2 = np.floor(self.mask.x_gridnum/2) + self.tcc.s.fnum  + 1
+        self.y1 = np.floor(self.mask.y_gridnum/2) - self.tcc.s.gnum 
+        self.y2 = np.floor(self.mask.y_gridnum/2) + self.tcc.s.gnum  + 1
+
+        self.spat_part = pyfftw.empty_aligned((self.mask.y_gridnum,self.mask.x_gridnum),\
+                                               dtype='complex128')
+        self.freq_part = pyfftw.empty_aligned((self.mask.y_gridnum,self.mask.x_gridnum),\
+                                               dtype='complex128')
+        self.ifft_image = pyfftw.FFTW(self.freq_part,self.spat_part,axes=(0,1),\
+                                     direction='FFTW_BACKWARD')            
         
-    def calAI(self):                 #much faster than calAIold()       
-        x1 = np.floor(self.mask.x_gridnum/2) - self.tcc.s.fnum
-        x2 = np.floor(self.mask.x_gridnum/2) + self.tcc.s.fnum  + 1
-        y1 = np.floor(self.mask.y_gridnum/2) - self.tcc.s.gnum 
-        y2 = np.floor(self.mask.y_gridnum/2) + self.tcc.s.gnum  + 1
-        
-        AI_freq_dense = np.zeros((self.mask.y_gridnum,self.mask.x_gridnum),dtype=np.complex)       
-        AI_freq_sparse = np.zeros((y2-y1,x2-x1),dtype=np.complex)       
+    def calAI(self):     #much faster than calAIold()       
+        AI_freq_dense = np.zeros((self.mask.y_gridnum,self.mask.x_gridnum),dtype=np.complex128)       
+        AI_freq_sparse = np.zeros((self.y2-self.y1,self.x2-self.x1),dtype=np.complex128)       
         for ii in range(self.order):
-            e_field = self.kernels[:,:,ii]*self.mask.fdata[y1:y2,x1:x2]
-            e_field_conj = np.conj(np.rot90(self.kernels[:,:,ii],2))*self.mask.fdata[y1:y2,x1:x2]
+            e_field = self.kernels[:,:,ii]*self.mask.fdata[self.y1:self.y2,self.x1:self.x2]
+            e_field_conj = np.conj(np.rot90(self.kernels[:,:,ii],2))*self.mask.fdata[self.y1:self.y2,self.x1:self.x2]
             AA = sg.convolve2d(e_field, e_field_conj,'same','wrap')
             AI_freq_sparse += self.coefs[ii]*AA     
-        AI_freq_dense[y1:y2,x1:x2] = AI_freq_sparse;
-        norm = self.mask.y_gridnum*self.mask.x_gridnum
-        self.AI = np.real(np.fft.fftshift(np.fft.ifft2(np.fft.ifftshift(AI_freq_dense))))/norm
+        AI_freq_dense[self.y1:self.y2,self.x1:self.x2] = AI_freq_sparse;
+
+        self.freq_part[:] = np.fft.ifftshift(AI_freq_dense)
+        self.ifft_image()
+        self.AI = np.real(np.fft.fftshift(self.spat_part))/self.norm
 
     def calAIold(self):         
-        x1 = np.floor(self.mask.x_gridnum/2) - self.tcc.s.fnum
-        x2 = np.floor(self.mask.x_gridnum/2) + self.tcc.s.fnum  + 1
-        y1 = np.floor(self.mask.y_gridnum/2) - self.tcc.s.gnum 
-        y2 = np.floor(self.mask.y_gridnum/2) + self.tcc.s.gnum  + 1
-        
         AI = np.zeros((self.mask.y_gridnum,self.mask.x_gridnum))       
         for ii in range(self.order):
-            e_field = np.zeros((self.mask.y_gridnum,self.mask.x_gridnum),dtype=np.complex) 
-            e_field[y1:y2,x1:x2] = self.kernels[:,:,ii]*self.mask.fdata[y1:y2,x1:x2]
+            e_field = np.zeros((self.mask.y_gridnum,self.mask.x_gridnum),dtype=np.complex128) 
+            e_field[self.y1:self.y2,self.x1:self.x2] = self.kernels[:,:,ii]*self.mask.fdata[self.y1:self.y2,self.x1:self.x2]
             AA = np.fft.fftshift(np.fft.ifft2(np.fft.ifftshift(e_field)))
             AI += self.coefs[ii]*np.abs(AA*np.conj(AA))     
         self.AI = AI
@@ -69,7 +75,21 @@ class ImageHopkinsList(ImageHopkins):
         self.RIList = []
         self.resist_a = 80
         self.resist_tRef = 0.5
-        
+
+        self.norm = self.mask.y_gridnum*self.mask.x_gridnum
+        self.x1 = np.floor(self.mask.x_gridnum/2) - self.tcc.s.fnum
+        self.x2 = np.floor(self.mask.x_gridnum/2) + self.tcc.s.fnum  + 1
+        self.y1 = np.floor(self.mask.y_gridnum/2) - self.tcc.s.gnum 
+        self.y2 = np.floor(self.mask.y_gridnum/2) + self.tcc.s.gnum  + 1
+
+        self.spat_part = pyfftw.empty_aligned((self.mask.y_gridnum,self.mask.x_gridnum),\
+                                               dtype='complex128')
+        self.freq_part = pyfftw.empty_aligned((self.mask.y_gridnum,self.mask.x_gridnum),\
+                                               dtype='complex128')
+        self.ifft_image = pyfftw.FFTW(self.freq_part,self.spat_part,axes=(0,1),\
+                                     direction='FFTW_BACKWARD')  
+                                               
+
     def calculate(self):
         length = len(self.focusList)
         for ii in xrange(length):

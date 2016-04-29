@@ -6,6 +6,7 @@ import numpy as np
 from source import Source
 from lens import LensList
 import scipy as sci
+import pyfftw
 
 class TCC:
     def __init__(self,source,lens):
@@ -34,9 +35,21 @@ class TCC:
         self.tcc2d = self.jsource * np.dot(H,H.transpose())/self.s.detaf/self.s.detag
         
     def svd(self):
+        self.spat_part = pyfftw.empty_aligned((self.gnum,self.fnum,self.gnum,self.fnum),\
+                                               dtype='complex128')
+        self.freq_part = pyfftw.empty_aligned((self.gnum,self.fnum,self.gnum,self.fnum),\
+                                               dtype='complex128')
+        self.fft_svd = pyfftw.FFTW(self.spat_part,self.freq_part,axes=(0,1,2,3))    
+        
+
         tcc4d = self.tcc2d.reshape((self.gnum,self.fnum,self.gnum,self.fnum))
-        tcc4df = np.fft.fftshift(np.fft.fftn(np.fft.ifftshift(tcc4d)))
+        self.spat_part[:] = np.fft.ifftshift(tcc4d)
+        self.fft_svd()
+        tcc4df = np.fft.fftshift(self.freq_part)
+        # tcc4df = np.fft.fftshift(np.fft.fftn(np.fft.ifftshift(tcc4d)))
+
         tcc2df = tcc4df.reshape((self.gnum*self.fnum,self.gnum*self.fnum))
+        
         # U,S,V = np.linalg.svd(tcc2df)
         U,S,V = sci.sparse.linalg.svds(tcc2df, self.order) #faster than svd
         self.coefs = S[0:self.order]

@@ -2,7 +2,7 @@
 Include pixel-based mask synthesis, imaging model for optical lithography in Python. This is a simplified package, maybe OUT-OF-DATA.
 
 #USAGE:
-1. These files base on PIL, Numpy, Sci packages. GDSii package is already included
+1. These files base on PIL, Numpy, Sci, pyFFTW packages. GDSii package is already included
 2. It can be run directly or included as a lib
 3. Just run this test.py for inverse mask synthesis application
 3. The NanGateLibGDS was accessed in (http://projects.si2.org/openeda.si2.org/projects/nangatelib)

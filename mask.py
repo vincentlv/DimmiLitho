@@ -8,6 +8,7 @@ Note: Binary Mask
 import numpy as np
 import math
 import scipy.signal as sg
+import pyfftw
 
 """This Libarary is Used Only for Polygon Data Processing
 """
@@ -50,7 +51,12 @@ class Mask:
                  
         self.data = np.array(img)
         self.data = np.float64(self.data)
-               
+
+        self.spat_part = pyfftw.empty_aligned((self.y_gridnum,self.x_gridnum),\
+                                               dtype='complex128')
+        self.freq_part = pyfftw.empty_aligned((self.y_gridnum,self.x_gridnum),\
+                                               dtype='complex128')
+        self.fft_mask = pyfftw.FFTW(self.spat_part,self.freq_part,axes=(0,1)) 
 
     def openGDS(self, gdsdir, layername, boundary = 0.16, scalerate = 45/70.0):
         
@@ -105,11 +111,23 @@ class Mask:
         
             self.perimeter += np.sum(np.abs(pp[0:-1] - pp[1:polygonlen]))
                  
-        self.data = np.array(img)        
-                
+        self.data = np.array(img)
+        # Creat fourier transform pair, pyfftw syntax
+        self.spat_part = pyfftw.empty_aligned((self.y_gridnum,self.x_gridnum),\
+                                               dtype='complex128')
+        self.freq_part = pyfftw.empty_aligned((self.y_gridnum,self.x_gridnum),\
+                                               dtype='complex128')
+        self.fft_mask = pyfftw.FFTW(self.spat_part,self.freq_part,axes=(0,1))            
+     
+    # use the fftw packages            
     def maskfft(self):
+        self.spat_part[:] = np.fft.ifftshift(self.data)
+        self.fft_mask()
+        self.fdata = np.fft.fftshift(self.freq_part)
+            
+    def maskfftold(self):
         self.fdata = np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(self.data)))
-        
+
     def smooth(self):
         xx = np.linspace(-1,1,21)
         X, Y = np.meshgrid(xx,xx)
@@ -139,6 +157,7 @@ if __name__ == '__main__':
     m.x_gridsize = 10
     m.y_gridsize = 10
     m.openGDS('./NanGateLibGDS/AND2_X4.gds',10)
+    m.maskfft()
 
     import matplotlib.pyplot as plt
     plt.imshow(m.data,\

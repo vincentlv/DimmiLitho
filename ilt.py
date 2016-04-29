@@ -8,6 +8,7 @@ from image import ImageHopkins, ImageHopkinsList
 import math
 import scipy.signal as sg
 import copy
+import pyfftw
 
 class ILT():
     def __init__(self, m, t):
@@ -19,6 +20,32 @@ class ILT():
         self.regWeight = 1.0
         self.stepSize = 0.2
         self.regError = []
+        self.prepare()
+
+
+    def prepare(self):
+        self.x1 = self.xsize/2 - self.image.tcc.s.fnum
+        self.x2 = self.xsize/2 + self.image.tcc.s.fnum  + 1
+        self.y1 = self.ysize/2 - self.image.tcc.s.gnum 
+        self.y2 = self.ysize/2 + self.image.tcc.s.gnum  + 1
+
+        self.spat_part = pyfftw.empty_aligned((self.image.mask.y_gridnum,\
+                                               self.image.mask.x_gridnum),\
+                                               dtype='complex128')
+        self.freq_part = pyfftw.empty_aligned((self.image.mask.y_gridnum,\
+                                               self.image.mask.x_gridnum),\
+                                               dtype='complex128')
+        self.ifft_ilt = pyfftw.FFTW(self.freq_part,self.spat_part,axes=(0,1),\
+                                     direction='FFTW_BACKWARD') 
+
+        self.spat_part2 = pyfftw.empty_aligned((self.image.mask.y_gridnum,\
+                                                self.image.mask.x_gridnum),\
+                                                dtype='complex128')
+        self.freq_part2 = pyfftw.empty_aligned((self.image.mask.y_gridnum,
+                                                self.image.mask.x_gridnum),\
+                                                dtype='complex128')
+        self.fft_ilt = pyfftw.FFTW(self.spat_part2,self.freq_part2,axes=(0,1))  
+
         
     def mask_init(self):
         x = np.linspace(-10,10,21)
@@ -26,7 +53,8 @@ class ILT():
         R = X**2 + Y**2
         O = np.exp(-R/2/(4**2))
         OO = O/np.sum(O)
-        D = sg.fftconvolve(1.0*self.image.mask.data+0.0, OO,'same',)
+        D = sg.fftconvolve(1.0*self.image.mask.data+0.0, OO,'same')
+        # D = pyfftw.interfaces.scipy_fftpack.convolve(1.0*self.image.mask.data+0.0, OO,'same')
         
         self.target = copy.deepcopy(self.image.mask.data)
         self.maskdata = 0.99*D + 0.01
@@ -40,28 +68,36 @@ class ILT():
         
     def calGrad(self):
         AA = (self.image.RI - self.target)*self.image.RI*(1 - self.image.RI)
-                
-        x1 = self.xsize/2 - self.image.tcc.s.fnum
-        x2 = self.xsize/2 + self.image.tcc.s.fnum  + 1
-        y1 = self.ysize/2 - self.image.tcc.s.gnum 
-        y2 = self.ysize/2 + self.image.tcc.s.gnum  + 1
-        
         self.grad = np.zeros((self.ysize,self.xsize))
         
         for ii in xrange(self.image.order):
             e_field = np.zeros((self.ysize,self.xsize), dtype=np.complex) 
-            e_field[y1:y2,x1:x2] = self.image.kernels[:,:,ii]*self.image.mask.fdata[y1:y2,x1:x2]
-  
-            BB = np.fft.fftshift(np.fft.ifft2(np.fft.ifftshift(e_field)))
-            CC = AA*BB
+            e_field[self.y1:self.y2,self.x1:self.x2] =\
+                  self.image.kernels[:,:,ii]*\
+                  self.image.mask.fdata[self.y1:self.y2,self.x1:self.x2]
             
-            CC_F = np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(CC)))
+            self.freq_part[:] = np.fft.ifftshift(e_field)
+            self.ifft_ilt()
+            BB = np.fft.fftshift(self.spat_part)
+            # BB = np.fft.fftshift(np.fft.ifft2(np.fft.ifftshift(e_field)))
+            CC = AA*BB
+
+            self.spat_part2[:] = np.fft.ifftshift(CC)
+            self.fft_ilt()
+            CC_F = np.fft.fftshift(self.freq_part2)
+            # CC_F = np.fft.fftshift(np.fft.fft2(np.fft.ifftshift(CC)))
+
             DD_F = np.conj(np.rot90(self.image.kernels[:,:,ii],2))
             EE_F = np.zeros((self.ysize,self.xsize),dtype=np.complex)
-            EE_F[y1:y2,x1:x2] = DD_F*CC_F[y1:y2,x1:x2]
-            EE = np.fft.fftshift(np.fft.ifft2(np.fft.ifftshift(EE_F)))
+            EE_F[self.y1:self.y2,self.x1:self.x2] = DD_F*CC_F[self.y1:self.y2,self.x1:self.x2]
+            
+            self.freq_part[:] = np.fft.ifftshift(EE_F)
+            self.ifft_ilt()
+            EE = np.fft.fftshift(self.spat_part)
+            # EE = np.fft.fftshift(np.fft.ifft2(np.fft.ifftshift(EE_F)))
+
             FF = self.image.coefs[ii]*(EE.real)
-            self.grad += FF
+            self.grad += np.real(FF)
         self.grad = -self.grad * np.sin(self.masktheta)
         
     def calRegTerm(self):
@@ -161,6 +197,7 @@ class RobustILT(ILT):
         self.mask_init()
         self.error = []
         self.regMode = False
+        self.prepare()
         
     def calRobustGrad(self):
         length = len(self.image.focusList)
@@ -174,7 +211,6 @@ class RobustILT(ILT):
                 self.calGrad()
                 self.robustGrad += self.image.doseCoef[jj]*self.image.focusCoef[ii]*self.grad                  
         self.grad = self.robustGrad
-        pass
     
         
     def robustCostFunction(self):
@@ -188,6 +224,7 @@ class RobustILT(ILT):
                     (self.image.mask.x_gridsize*self.image.mask.y_gridsize/self.image.mask.perimeter)
                 ra +=  self.image.doseCoef[jj]*self.image.focusCoef[ii]*a
         self.error.append(ra/norm)
+
         
     def run(self,num = 10):       
         for ii in xrange(num):
@@ -240,26 +277,23 @@ if __name__ == '__main__' :
     o.calculate()
     
     print "Calculating TCC and SVD kernels"
-    time.sleep(0.1)
-    
     t = TCCList(s,o)
     t.calculate()
     
     print "Calculating ILT"
     i = RobustILT(m,t)
     i.image.resist_a = 100
-    i.image.resist_tRef = 0.2
+    i.image.resist_tRef = 0.6
     i.stepSize = 0.4
     i.image.doseList = [0.9,1,1.1]
     i.image.doseCoef = [0.3,1, 0.3]
     i.run(2)
     
+
     a= np.array(i.error)
     b = (a[0:-2] - a[1:-1]) /a[0:-2]
 
 
-    
-    
 #    s = Source()
 #    s.na = 1.25
 #    s.maskxpitch = 600.0
