@@ -22,7 +22,7 @@ This module contains classes for low-level GDSII I/O.
 
 .. moduleauthor:: Eugeniy Meshcheryakov <eugen@debian.org>
 """
-from __future__ import absolute_import
+
 from . import exceptions, tags, types
 from datetime import datetime
 import math

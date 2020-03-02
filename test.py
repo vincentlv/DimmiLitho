@@ -43,13 +43,13 @@ o.calculate()
 
 
 tic = time.time()
-print "Calculating TCC and SVD kernels"
+print("Calculating TCC and SVD kernels")
 t = TCCList(s, o)
 t.calculate()
-print "###taking %1.3f seconds" % (time.time() - tic)
+print("###taking %1.3f seconds" % (time.time() - tic))
 
 
-print "Calculating ILT"
+print("Calculating ILT")
 i = RobustILT(m, t)
 i.image.resist_a = 100
 i.image.resist_tRef = 0.9

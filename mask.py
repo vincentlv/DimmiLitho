@@ -72,7 +72,7 @@ class Mask:
         xmax = []
         ymin = []
         ymax = []
-        for ii in xrange(0, len(a)):
+        for ii in range(0, len(a)):
             if a[ii].layer == layername:
                 # if hasattr(a[ii],'data_type'):
                 if len(a[ii].xy) > 1:

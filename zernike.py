@@ -3,7 +3,7 @@ Created on Mon May 19 13:30:30 2014
 @author: WenLv
 """
 
-from scipy.misc import factorial
+from math import factorial
 from numpy import meshgrid, sqrt, arctan2, zeros, cos, sin, array, where, linspace
 
 
@@ -23,7 +23,7 @@ def rnm(n, m, rho):
     Return an array with the zernike Rnm polynomial calculated at rho points.
     """
     Rnm = zeros(rho.shape)
-    S = (n - abs(m)) / 2
+    S = int((n - abs(m)) / 2)
     for s in range(0, S + 1):
         CR = (
             pow(-1, s)

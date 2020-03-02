@@ -23,10 +23,10 @@ class ImageHopkins:
         self.coefs = tcc.coefs  # Coefs
 
         self.norm = self.mask.y_gridnum * self.mask.x_gridnum
-        self.x1 = np.floor(self.mask.x_gridnum / 2) - self.tcc.s.fnum
-        self.x2 = np.floor(self.mask.x_gridnum / 2) + self.tcc.s.fnum + 1
-        self.y1 = np.floor(self.mask.y_gridnum / 2) - self.tcc.s.gnum
-        self.y2 = np.floor(self.mask.y_gridnum / 2) + self.tcc.s.gnum + 1
+        self.x1 = int(np.floor(self.mask.x_gridnum / 2) - self.tcc.s.fnum)
+        self.x2 = int(np.floor(self.mask.x_gridnum / 2) + self.tcc.s.fnum + 1)
+        self.y1 = int(np.floor(self.mask.y_gridnum / 2) - self.tcc.s.gnum)
+        self.y2 = int(np.floor(self.mask.y_gridnum / 2) + self.tcc.s.gnum + 1)
 
         self.spat_part = pyfftw.empty_aligned(
             (self.mask.y_gridnum, self.mask.x_gridnum), dtype="complex128"
@@ -114,7 +114,7 @@ class ImageHopkinsList(ImageHopkins):
 
     def calculate(self):
         length = len(self.focusList)
-        for ii in xrange(length):
+        for ii in range(length):
             self.kernels = self.kernelList[ii]
             self.coefs = self.coefList[ii]
             self.calAI()

@@ -41,8 +41,8 @@ class Source:
     def update(self):
         self.detaf = self.wavelength / (self.maskxpitch * self.na)
         self.detag = self.wavelength / (self.maskypitch * self.na)
-        self.fnum = np.ceil(2 / self.detaf)
-        self.gnum = np.ceil(2 / self.detag)
+        self.fnum = int(np.ceil(2 / self.detaf))
+        self.gnum = int(np.ceil(2 / self.detag))
 
         fx = np.linspace(
             -self.fnum * self.detaf, self.fnum * self.detaf, 2 * self.fnum + 1

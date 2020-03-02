@@ -25,8 +25,8 @@ class Lens:
     def update(self):
         self.detaf = self.wavelength / (self.maskxpitch * self.na)
         self.detag = self.wavelength / (self.maskypitch * self.na)
-        self.fnum = np.ceil(2 / self.detaf)
-        self.gnum = np.ceil(2 / self.detag)
+        self.fnum = int(np.ceil(2 / self.detaf))
+        self.gnum = int(np.ceil(2 / self.detag))
 
     def calPupil(self, shiftx=0, shifty=0):
         fx = np.linspace(

@@ -60,7 +60,7 @@ Additional definitions:
 
 .. moduleauthor:: Eugeniy Meshcheryakov <eugen@debian.org>
 """
-from __future__ import absolute_import
+
 from . import exceptions, record, tags, _records
 
 __all__ = ("Boundary", "Path", "SRef", "ARef", "Text", "Node", "Box")

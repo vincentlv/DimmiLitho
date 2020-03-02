@@ -69,7 +69,7 @@ class ILT:
         AA = (self.image.RI - self.target) * self.image.RI * (1 - self.image.RI)
         self.grad = np.zeros((self.ysize, self.xsize))
 
-        for ii in xrange(self.image.order):
+        for ii in range(self.image.order):
             e_field = np.zeros((self.ysize, self.xsize), dtype=np.complex)
             e_field[self.y1 : self.y2, self.x1 : self.x2] = (
                 self.image.kernels[:, :, ii]
@@ -150,7 +150,7 @@ class ILT:
             index1 = newTheta < 0
             newTheta[index1] = -newTheta[index1]
         else:
-            print "all zero!!"
+            print("all zero!!")
         self.masktheta = newTheta
         self.maskdata = (1 + np.cos(self.masktheta)) / 2
         self.image.mask.data = self.maskdata
@@ -173,7 +173,7 @@ class ILT:
 
     def run(self, num=10):
         self.mask_init()
-        for ii in xrange(num):
+        for ii in range(num):
             self.image.mask.maskfft()
             self.image.calAI()
             self.image.calRI()
@@ -181,10 +181,10 @@ class ILT:
             self.calGrad()
             self.calRegTerm()
             self.updateThetaConstSize()
-            print ii
+            print(ii)
 
     def keepon(self, num=10):
-        for ii in xrange(num):
+        for ii in range(num):
             self.image.mask.maskfft()
             self.image.calAI()
             self.image.calRI()
@@ -192,7 +192,7 @@ class ILT:
             self.calGrad()
             self.calRegTerm()
             self.updateThetaConstSize()
-            print ii
+            print(ii)
 
     def costfunction(self):
         a = np.sum((self.image.RI - self.target) ** 2) * (
@@ -217,10 +217,10 @@ class RobustILT(ILT):
         length = len(self.image.focusList)
         lengthD = len(self.image.doseList)
         self.robustGrad = np.zeros((self.ysize, self.xsize))
-        for ii in xrange(length):
+        for ii in range(length):
             self.image.kernels = self.image.kernelList[ii]
             self.image.coefs = self.image.coefList[ii]
-            for jj in xrange(lengthD):
+            for jj in range(lengthD):
                 self.image.RI = self.image.RIList[ii][jj]
                 self.calGrad()
                 self.robustGrad += (
@@ -233,8 +233,8 @@ class RobustILT(ILT):
         lengthD = len(self.image.doseList)
         norm = np.sum(self.image.doseCoef) * np.sum(self.image.focusCoef)
         ra = 0.0
-        for ii in xrange(length):
-            for jj in xrange(lengthD):
+        for ii in range(length):
+            for jj in range(lengthD):
                 a = np.sum((self.image.RIList[ii][jj] - self.target) ** 2) * (
                     self.image.mask.x_gridsize
                     * self.image.mask.y_gridsize
@@ -244,7 +244,7 @@ class RobustILT(ILT):
         self.error.append(ra / norm)
 
     def run(self, num=10):
-        for ii in xrange(num):
+        for ii in range(num):
             self.image.mask.maskfft()
             self.image.AIList = []
             self.image.RIList = []
@@ -253,10 +253,10 @@ class RobustILT(ILT):
             self.calRobustGrad()
             self.calRegTerm()
             self.updateThetaConstSize()
-            print "Interation index: %d, Costfunction value: %4f." % (
+            print("Interation index: %d, Costfunction value: %4f." % (
                 ii,
                 self.error[ii],
-            )
+            ))
 
 
 if __name__ == "__main__":
@@ -296,11 +296,11 @@ if __name__ == "__main__":
     o.focusCoef = [1, 0.5]
     o.calculate()
 
-    print "Calculating TCC and SVD kernels"
+    print("Calculating TCC and SVD kernels")
     t = TCCList(s, o)
     t.calculate()
 
-    print "Calculating ILT"
+    print("Calculating ILT")
     i = RobustILT(m, t)
     i.image.resist_a = 100
     i.image.resist_tRef = 0.6

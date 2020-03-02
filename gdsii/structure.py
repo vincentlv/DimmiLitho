@@ -22,7 +22,7 @@ This module contains class that represents a GDSII structure.
 
 .. moduleauthor:: Eugeniy Meshcheryakov <eugen@debian.org>
 """
-from __future__ import absolute_import
+
 from . import elements, record, tags, _records
 from datetime import datetime
 

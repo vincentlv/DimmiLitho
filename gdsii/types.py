@@ -33,7 +33,7 @@ DICT = {
 
 REV_DICT = {}
 
-for (key, value) in DICT.items():
+for (key, value) in list(DICT.items()):
     globals()[key] = value
     REV_DICT[value] = key
 
