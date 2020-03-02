@@ -28,15 +28,14 @@ from datetime import datetime
 import math
 import struct
 
-__all__ = [
-    'Record',
-    'Reader'
-]
+__all__ = ["Record", "Reader"]
 
-_RECORD_HEADER_FMT = struct.Struct('>HH')
+_RECORD_HEADER_FMT = struct.Struct(">HH")
+
 
 def _parse_nodata(data):
     """Parse :const:`NODATA` data type. Does nothing."""
+
 
 def _parse_bitarray(data):
     """
@@ -54,9 +53,10 @@ def _parse_bitarray(data):
         IncorrectDataSize: BITARRAY
     """
     if len(data) != 2:
-        raise exceptions.IncorrectDataSize('BITARRAY')
-    (val,) = struct.unpack('>H', data)
+        raise exceptions.IncorrectDataSize("BITARRAY")
+    (val,) = struct.unpack(">H", data)
     return val
+
 
 def _parse_int2(data):
     """
@@ -75,8 +75,9 @@ def _parse_int2(data):
     """
     data_len = len(data)
     if not data_len or (data_len % 2):
-        raise exceptions.IncorrectDataSize('INT2')
-    return struct.unpack('>%dh' % (data_len//2), data)
+        raise exceptions.IncorrectDataSize("INT2")
+    return struct.unpack(">%dh" % (data_len // 2), data)
+
 
 def _parse_int4(data):
     """
@@ -95,8 +96,9 @@ def _parse_int4(data):
     """
     data_len = len(data)
     if not data_len or (data_len % 4):
-        raise exceptions.IncorrectDataSize('INT4')
-    return struct.unpack('>%dl' % (data_len//4), data)
+        raise exceptions.IncorrectDataSize("INT4")
+    return struct.unpack(">%dl" % (data_len // 4), data)
+
 
 def _int_to_real(num):
     """
@@ -117,9 +119,10 @@ def _int_to_real(num):
         -2.0
     """
     sgn = -1 if 0x8000000000000000 & num else 1
-    mant = num & 0x00ffffffffffffff
-    exp = (num >> 56) & 0x7f
+    mant = num & 0x00FFFFFFFFFFFFFF
+    exp = (num >> 56) & 0x7F
     return math.ldexp(sgn * mant, 4 * (exp - 64) - 56)
+
 
 def _parse_real8(data):
     """
@@ -138,9 +141,10 @@ def _parse_real8(data):
     """
     data_len = len(data)
     if not data_len or (data_len % 8):
-        raise exceptions.IncorrectDataSize('REAL8')
-    ints = struct.unpack('>%dQ' % (data_len//8), data)
+        raise exceptions.IncorrectDataSize("REAL8")
+    ints = struct.unpack(">%dQ" % (data_len // 8), data)
     return tuple(_int_to_real(n) for n in ints)
+
 
 def _parse_ascii(data):
     r"""
@@ -156,11 +160,12 @@ def _parse_ascii(data):
         True
     """
     if not len(data):
-        raise exceptions.IncorrectDataSize('ASCII')
+        raise exceptions.IncorrectDataSize("ASCII")
     # XXX cross-version compatibility
-    if data[-1:] == b'\0':
+    if data[-1:] == b"\0":
         return data[:-1]
     return data
+
 
 _PARSE_FUNCS = {
     types.NODATA: _parse_nodata,
@@ -168,8 +173,9 @@ _PARSE_FUNCS = {
     types.INT2: _parse_int2,
     types.INT4: _parse_int4,
     types.REAL8: _parse_real8,
-    types.ASCII: _parse_ascii
+    types.ASCII: _parse_ascii,
 }
+
 
 def _pack_nodata(data):
     """
@@ -181,7 +187,8 @@ def _pack_nodata(data):
        >>> len(packed)
        0
     """
-    return b''
+    return b""
+
 
 def _pack_bitarray(data):
     """
@@ -193,7 +200,8 @@ def _pack_bitarray(data):
         >>> len(packed)
         2
     """
-    return struct.pack('>H', data)
+    return struct.pack(">H", data)
+
 
 def _pack_int2(data):
     """
@@ -208,7 +216,8 @@ def _pack_int2(data):
         6
     """
     size = len(data)
-    return struct.pack('>{0}h'.format(size), *data)
+    return struct.pack(">{0}h".format(size), *data)
+
 
 def _pack_int4(data):
     """
@@ -223,7 +232,8 @@ def _pack_int4(data):
         12
     """
     size = len(data)
-    return struct.pack('>{0}l'.format(size), *data)
+    return struct.pack(">{0}l".format(size), *data)
+
 
 def _real_to_int(fnum):
     """
@@ -239,10 +249,10 @@ def _real_to_int(fnum):
         1e-09
     """
     # first convert number to IEEE double and split it in parts
-    (ieee,) = struct.unpack('=Q', struct.pack('=d', fnum))
+    (ieee,) = struct.unpack("=Q", struct.pack("=d", fnum))
     sign = ieee & 0x8000000000000000
-    ieee_exp = (ieee >> 52) & 0x7ff
-    ieee_mant = ieee & 0xfffffffffffff
+    ieee_exp = (ieee >> 52) & 0x7FF
+    ieee_mant = ieee & 0xFFFFFFFFFFFFF
 
     if ieee_exp == 0:
         # zero or denormals
@@ -268,14 +278,15 @@ def _real_to_int(fnum):
 
     # try to fit everything
     if exp16_biased < -14:
-        return 0 # number is too small. FIXME is it possible?
+        return 0  # number is too small. FIXME is it possible?
     elif exp16_biased < 0:
         ieee_mant_comp = ieee_mant_comp >> (exp16_biased * 4)
         exp16_biased = 0
-    elif exp16_biased > 0x7f:
-        raise exceptions.FormatError('number is to big for REAL8')
+    elif exp16_biased > 0x7F:
+        raise exceptions.FormatError("number is to big for REAL8")
 
     return sign | (exp16_biased << 56) | ieee_mant_comp
+
 
 def _pack_real8(data):
     """
@@ -288,7 +299,8 @@ def _pack_real8(data):
         ['0.0', '1.0', '-1.0', '0.5', '1e-09']
     """
     size = len(data)
-    return struct.pack('>{0}Q'.format(size), *[_real_to_int(num) for num in data])
+    return struct.pack(">{0}Q".format(size), *[_real_to_int(num) for num in data])
+
 
 def _pack_ascii(data):
     r"""
@@ -301,8 +313,9 @@ def _pack_ascii(data):
     """
     size = len(data)
     if size % 2:
-        return data + b'\0'
+        return data + b"\0"
     return data
+
 
 _PACK_FUNCS = {
     types.NODATA: _pack_nodata,
@@ -310,8 +323,9 @@ _PACK_FUNCS = {
     types.INT2: _pack_int2,
     types.INT4: _pack_int4,
     types.REAL8: _pack_real8,
-    types.ASCII: _pack_ascii
+    types.ASCII: _pack_ascii,
 }
+
 
 class Record(object):
     """
@@ -336,7 +350,8 @@ class Record(object):
         >>> r.tag_type_name
         '0xff'
     """
-    __slots__ = ['tag', 'data']
+
+    __slots__ = ["tag", "data"]
 
     def __init__(self, tag, data=None, points=None, times=None, acls=None):
         """Initialize with tag and parsed data."""
@@ -365,7 +380,7 @@ class Record(object):
                 acc_time.day,
                 acc_time.hour,
                 acc_time.minute,
-                acc_time.second
+                acc_time.second,
             )
         elif acls is not None:
             new_data = []
@@ -388,7 +403,7 @@ class Record(object):
             MissingRecord: Wanted: 3586, got: STRNAME
         """
         if self.tag != tag:
-            raise exceptions.MissingRecord('Wanted: %s, got: %s'%(tag, self.tag_name))
+            raise exceptions.MissingRecord("Wanted: %s, got: %s" % (tag, self.tag_name))
 
     def check_size(self, size):
         """
@@ -420,11 +435,11 @@ class Record(object):
             raise exceptions.EndOfFileError
         data_size, tag = _RECORD_HEADER_FMT.unpack(header)
         if data_size < 4:
-            raise exceptions.IncorrectDataSize('data size is too small')
+            raise exceptions.IncorrectDataSize("data size is too small")
         if data_size % 2:
-            raise exceptions.IncorrectDataSize('data size is odd')
+            raise exceptions.IncorrectDataSize("data size is odd")
 
-        data_size -= 4 # substract header size
+        data_size -= 4  # substract header size
 
         data = stream.read(data_size)
         if len(data) != data_size:
@@ -454,7 +469,7 @@ class Record(object):
         packed_data = pack_func(self.data)
         record_size = len(packed_data) + 4
         if record_size > 0xFFFF:
-            raise exceptions.FormatError('data size is too big')
+            raise exceptions.FormatError("data size is too big")
         header = _RECORD_HEADER_FMT.pack(record_size, self.tag)
         stream.write(header)
         stream.write(packed_data)
@@ -464,7 +479,7 @@ class Record(object):
         """Tag name, if known, otherwise tag ID formatted as hex number."""
         if self.tag in tags.REV_DICT:
             return tags.REV_DICT[self.tag]
-        return '0x%04x' % self.tag
+        return "0x%04x" % self.tag
 
     @property
     def tag_type(self):
@@ -477,7 +492,7 @@ class Record(object):
         tag_type = tags.type_of_tag(self.tag)
         if tag_type in types.REV_DICT:
             return types.REV_DICT[tag_type]
-        return '0x%02x' % tag_type
+        return "0x%02x" % tag_type
 
     @property
     def points(self):
@@ -503,7 +518,7 @@ class Record(object):
         data_size = len(self.data)
         if not data_size or (data_size % 2):
             raise exceptions.DataSizeError(self.tag)
-        return [(self.data[i], self.data[i+1]) for i in range(0, data_size, 2)]
+        return [(self.data[i], self.data[i + 1]) for i in range(0, data_size, 2)]
 
     @property
     def times(self):
@@ -524,8 +539,10 @@ class Record(object):
         """
         if len(self.data) != 12:
             raise exceptions.DataSizeError(self.tag)
-        return (datetime(self.data[0]+1900, *self.data[1:6]),
-                datetime(self.data[6]+1900, *self.data[7:12]))
+        return (
+            datetime(self.data[0] + 1900, *self.data[1:6]),
+            datetime(self.data[6] + 1900, *self.data[7:12]),
+        )
 
     @property
     def acls(self):
@@ -561,9 +578,11 @@ class Record(object):
                 last = True
             yield rec
 
+
 class Reader(object):
     """Class for buffered reading of Records"""
-    __slots__  = ('current', 'stream')
+
+    __slots__ = ("current", "stream")
 
     def __init__(self, stream):
         self.stream = stream
@@ -573,6 +592,8 @@ class Reader(object):
         self.current = Record.read(self.stream)
         return self.current
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod(optionflags=doctest.IGNORE_EXCEPTION_DETAIL)

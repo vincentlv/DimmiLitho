@@ -26,9 +26,10 @@ from __future__ import absolute_import
 from . import elements, record, tags, _records
 from datetime import datetime
 
-_STRNAME = _records.StringRecord('name', tags.STRNAME)
-_BGNSTR = _records.TimestampsRecord('mod_time', 'acc_time', tags.BGNSTR)
-_STRCLASS = _records.SimpleOptionalRecord('strclass', tags.STRCLASS)
+_STRNAME = _records.StringRecord("name", tags.STRNAME)
+_BGNSTR = _records.TimestampsRecord("mod_time", "acc_time", tags.BGNSTR)
+_STRCLASS = _records.SimpleOptionalRecord("strclass", tags.STRCLASS)
+
 
 class Structure(list):
     """
@@ -43,6 +44,7 @@ class Structure(list):
                      : {`element`}*
                      : ENDSTR
     """
+
     _gds_objs = (_BGNSTR, _STRNAME, _STRCLASS)
 
     def __init__(self, name, mod_time=None, acc_time=None):
@@ -81,4 +83,4 @@ class Structure(list):
         record.Record(tags.ENDSTR).save(stream)
 
     def __repr__(self):
-        return '<Structure: %s>' % self.name.decode()
+        return "<Structure: %s>" % self.name.decode()

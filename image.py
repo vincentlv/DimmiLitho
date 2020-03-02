@@ -11,57 +11,77 @@ import numpy as np
 import scipy.signal as sg
 import pyfftw
 
+
 class ImageHopkins:
     def __init__(self, mask, tcc):
-        self.tcc = tcc               # TCC
-        self.mask = mask             # Mask
-        self.order = tcc.order       # TCC Order
-        self.resist_a = 80           # Resist model parameter: sharpness
-        self.resist_t = 0.6          # Resist model parameter: threshold
-        self.kernels = tcc.kernels   # Kernels
-        self.coefs = tcc.coefs       # Coefs
+        self.tcc = tcc  # TCC
+        self.mask = mask  # Mask
+        self.order = tcc.order  # TCC Order
+        self.resist_a = 80  # Resist model parameter: sharpness
+        self.resist_t = 0.6  # Resist model parameter: threshold
+        self.kernels = tcc.kernels  # Kernels
+        self.coefs = tcc.coefs  # Coefs
 
-        self.norm = self.mask.y_gridnum*self.mask.x_gridnum
-        self.x1 = np.floor(self.mask.x_gridnum/2) - self.tcc.s.fnum
-        self.x2 = np.floor(self.mask.x_gridnum/2) + self.tcc.s.fnum  + 1
-        self.y1 = np.floor(self.mask.y_gridnum/2) - self.tcc.s.gnum 
-        self.y2 = np.floor(self.mask.y_gridnum/2) + self.tcc.s.gnum  + 1
+        self.norm = self.mask.y_gridnum * self.mask.x_gridnum
+        self.x1 = np.floor(self.mask.x_gridnum / 2) - self.tcc.s.fnum
+        self.x2 = np.floor(self.mask.x_gridnum / 2) + self.tcc.s.fnum + 1
+        self.y1 = np.floor(self.mask.y_gridnum / 2) - self.tcc.s.gnum
+        self.y2 = np.floor(self.mask.y_gridnum / 2) + self.tcc.s.gnum + 1
 
-        self.spat_part = pyfftw.empty_aligned((self.mask.y_gridnum,self.mask.x_gridnum),\
-                                               dtype='complex128')
-        self.freq_part = pyfftw.empty_aligned((self.mask.y_gridnum,self.mask.x_gridnum),\
-                                               dtype='complex128')
-        self.ifft_image = pyfftw.FFTW(self.freq_part,self.spat_part,axes=(0,1),\
-                                     direction='FFTW_BACKWARD')            
-        
-    def calAI(self):     #much faster than calAIold()       
-        AI_freq_dense = np.zeros((self.mask.y_gridnum,self.mask.x_gridnum),dtype=np.complex128)       
-        AI_freq_sparse = np.zeros((self.y2-self.y1,self.x2-self.x1),dtype=np.complex128)       
+        self.spat_part = pyfftw.empty_aligned(
+            (self.mask.y_gridnum, self.mask.x_gridnum), dtype="complex128"
+        )
+        self.freq_part = pyfftw.empty_aligned(
+            (self.mask.y_gridnum, self.mask.x_gridnum), dtype="complex128"
+        )
+        self.ifft_image = pyfftw.FFTW(
+            self.freq_part, self.spat_part, axes=(0, 1), direction="FFTW_BACKWARD"
+        )
+
+    def calAI(self):  # much faster than calAIold()
+        AI_freq_dense = np.zeros(
+            (self.mask.y_gridnum, self.mask.x_gridnum), dtype=np.complex128
+        )
+        AI_freq_sparse = np.zeros(
+            (self.y2 - self.y1, self.x2 - self.x1), dtype=np.complex128
+        )
         for ii in range(self.order):
-            e_field = self.kernels[:,:,ii]*self.mask.fdata[self.y1:self.y2,self.x1:self.x2]
-            e_field_conj = np.conj(np.rot90(self.kernels[:,:,ii],2))*self.mask.fdata[self.y1:self.y2,self.x1:self.x2]
-            AA = sg.convolve2d(e_field, e_field_conj,'same','wrap')
-            AI_freq_sparse += self.coefs[ii]*AA     
-        AI_freq_dense[self.y1:self.y2,self.x1:self.x2] = AI_freq_sparse;
+            e_field = (
+                self.kernels[:, :, ii]
+                * self.mask.fdata[self.y1 : self.y2, self.x1 : self.x2]
+            )
+            e_field_conj = (
+                np.conj(np.rot90(self.kernels[:, :, ii], 2))
+                * self.mask.fdata[self.y1 : self.y2, self.x1 : self.x2]
+            )
+            AA = sg.convolve2d(e_field, e_field_conj, "same", "wrap")
+            AI_freq_sparse += self.coefs[ii] * AA
+        AI_freq_dense[self.y1 : self.y2, self.x1 : self.x2] = AI_freq_sparse
 
         self.freq_part[:] = np.fft.ifftshift(AI_freq_dense)
         self.ifft_image()
-        self.AI = np.real(np.fft.fftshift(self.spat_part))/self.norm
+        self.AI = np.real(np.fft.fftshift(self.spat_part)) / self.norm
 
-    def calAIold(self):         
-        AI = np.zeros((self.mask.y_gridnum,self.mask.x_gridnum))       
+    def calAIold(self):
+        AI = np.zeros((self.mask.y_gridnum, self.mask.x_gridnum))
         for ii in range(self.order):
-            e_field = np.zeros((self.mask.y_gridnum,self.mask.x_gridnum),dtype=np.complex128) 
-            e_field[self.y1:self.y2,self.x1:self.x2] = self.kernels[:,:,ii]*self.mask.fdata[self.y1:self.y2,self.x1:self.x2]
+            e_field = np.zeros(
+                (self.mask.y_gridnum, self.mask.x_gridnum), dtype=np.complex128
+            )
+            e_field[self.y1 : self.y2, self.x1 : self.x2] = (
+                self.kernels[:, :, ii]
+                * self.mask.fdata[self.y1 : self.y2, self.x1 : self.x2]
+            )
             AA = np.fft.fftshift(np.fft.ifft2(np.fft.ifftshift(e_field)))
-            AI += self.coefs[ii]*np.abs(AA*np.conj(AA))     
+            AI += self.coefs[ii] * np.abs(AA * np.conj(AA))
         self.AI = AI
-    
+
     def calRI(self):
-        self.RI = 1/(1+np.exp(-self.resist_a*(self.AI - self.resist_t)))
- 
+        self.RI = 1 / (1 + np.exp(-self.resist_a * (self.AI - self.resist_t)))
+
+
 class ImageHopkinsList(ImageHopkins):
-    def __init__(self,mask, tccList):
+    def __init__(self, mask, tccList):
         self.mask = mask
         self.tcc = tccList
         self.order = tccList.order
@@ -76,19 +96,21 @@ class ImageHopkinsList(ImageHopkins):
         self.resist_a = 80
         self.resist_tRef = 0.5
 
-        self.norm = self.mask.y_gridnum*self.mask.x_gridnum
-        self.x1 = np.floor(self.mask.x_gridnum/2) - self.tcc.s.fnum
-        self.x2 = np.floor(self.mask.x_gridnum/2) + self.tcc.s.fnum  + 1
-        self.y1 = np.floor(self.mask.y_gridnum/2) - self.tcc.s.gnum 
-        self.y2 = np.floor(self.mask.y_gridnum/2) + self.tcc.s.gnum  + 1
+        self.norm = self.mask.y_gridnum * self.mask.x_gridnum
+        self.x1 = np.floor(self.mask.x_gridnum / 2) - self.tcc.s.fnum
+        self.x2 = np.floor(self.mask.x_gridnum / 2) + self.tcc.s.fnum + 1
+        self.y1 = np.floor(self.mask.y_gridnum / 2) - self.tcc.s.gnum
+        self.y2 = np.floor(self.mask.y_gridnum / 2) + self.tcc.s.gnum + 1
 
-        self.spat_part = pyfftw.empty_aligned((self.mask.y_gridnum,self.mask.x_gridnum),\
-                                               dtype='complex128')
-        self.freq_part = pyfftw.empty_aligned((self.mask.y_gridnum,self.mask.x_gridnum),\
-                                               dtype='complex128')
-        self.ifft_image = pyfftw.FFTW(self.freq_part,self.spat_part,axes=(0,1),\
-                                     direction='FFTW_BACKWARD')  
-                                               
+        self.spat_part = pyfftw.empty_aligned(
+            (self.mask.y_gridnum, self.mask.x_gridnum), dtype="complex128"
+        )
+        self.freq_part = pyfftw.empty_aligned(
+            (self.mask.y_gridnum, self.mask.x_gridnum), dtype="complex128"
+        )
+        self.ifft_image = pyfftw.FFTW(
+            self.freq_part, self.spat_part, axes=(0, 1), direction="FFTW_BACKWARD"
+        )
 
     def calculate(self):
         length = len(self.focusList)
@@ -99,21 +121,48 @@ class ImageHopkinsList(ImageHopkins):
             self.AIList.append(self.AI)
             self.RIList.append([])
             for jj in self.doseList:
-                self.resist_t = self.resist_tRef*jj
+                self.resist_t = self.resist_tRef * jj
                 self.calRI()
                 self.RIList[ii].append(self.RI)
-                        
+
+
 if __name__ == "__main__":
-    from tcc import TCCList,TCC
-    from mask import Mask 
+    from tcc import TCCList, TCC
+    from mask import Mask
     from source import Source
     from lens import LensList, Lens
-    
-    mp = [ [[-1,6],[-1, 2],[1, 2],[1, 1],[6, 1],[6, 0],[0, 0],[0, 1],[-2, 1],[-2, 6],[-1, 6]], \
-       [[6, -1],[6, -2],[1, -2],[1, -3],[4, -3],[4, -6],[3, -6],[3, -4],[0, -4],[0, -1],[6, -1]] ]
+
+    mp = [
+        [
+            [-1, 6],
+            [-1, 2],
+            [1, 2],
+            [1, 1],
+            [6, 1],
+            [6, 0],
+            [0, 0],
+            [0, 1],
+            [-2, 1],
+            [-2, 6],
+            [-1, 6],
+        ],
+        [
+            [6, -1],
+            [6, -2],
+            [1, -2],
+            [1, -3],
+            [4, -3],
+            [4, -6],
+            [3, -6],
+            [3, -4],
+            [0, -4],
+            [0, -1],
+            [6, -1],
+        ],
+    ]
     m = Mask()
-    m.x_range = [-300.0,300.0]
-    m.y_range = [-400.0,300.0]
+    m.x_range = [-300.0, 300.0]
+    m.y_range = [-400.0, 300.0]
     m.x_gridsize = 1.0
     m.y_gridsize = 1.0
     m.CD = 40
@@ -121,18 +170,18 @@ if __name__ == "__main__":
     m.poly2mask()
     m.smooth()
     m.maskfft()
-    
+
     """nominal ILT setting"""
     s = Source()
     s.na = 1.35
     s.maskxpitch = 600.0
     s.maskypitch = 800.0
-    s.type = 'annular'
+    s.type = "annular"
     s.sigma_in = 0.6
     s.sigma_out = 0.8
     s.update()
     s.ifft()
-    
+
     o = Lens()
     o.na = s.na
     o.maskxpitch = s.maskxpitch
@@ -140,39 +189,38 @@ if __name__ == "__main__":
     o.update()
     o.calPupil()
     o.calPSF()
-    
-    t = TCC(s,o)
+
+    t = TCC(s, o)
     t.calMutualIntensity()
     t.calSpatTCC()
     t.svd()
-    
-    i = ImageHopkins(m,t)
+
+    i = ImageHopkins(m, t)
     i.calAI()
-    
-    
+
     """robust ILT setting"""
-    #s = Source()
-    #s.na = 1.25
-    #s.maskxpitch = 600.0
-    #s.maskypitch = 1000
-    #s.type = 'annular'
-    #s.sigma_in = 0.5
-    #s.sigma_out = 0.8
-    #s.update()
-    #s.ifft()
+    # s = Source()
+    # s.na = 1.25
+    # s.maskxpitch = 600.0
+    # s.maskypitch = 1000
+    # s.type = 'annular'
+    # s.sigma_in = 0.5
+    # s.sigma_out = 0.8
+    # s.update()
+    # s.ifft()
     #
-    #o = LensList()
-    #o.na = s.na
-    #o.maskxpitch = s.maskxpitch
-    #o.maskypitch = s.maskypitch
-    #o.focusList = [-50, 0, 50]
-    #o.focusCoef = [0.5, 1, 0.5]
-    #o.calculate()
+    # o = LensList()
+    # o.na = s.na
+    # o.maskxpitch = s.maskxpitch
+    # o.maskypitch = s.maskypitch
+    # o.focusList = [-50, 0, 50]
+    # o.focusCoef = [0.5, 1, 0.5]
+    # o.calculate()
     #
-    #t = TCCList(s,o)
-    #t.calculate()
+    # t = TCCList(s,o)
+    # t.calculate()
     #
-    #i = ImageHopkinsList(m,t)
-    #i.doseList = [0.95, 1, 1.05]
-    #i.doseCoef = [0.5, 1, 0.5]
-    #i.calculate()
+    # i = ImageHopkinsList(m,t)
+    # i.doseList = [0.95, 1, 1.05]
+    # i.doseCoef = [0.5, 1, 0.5]
+    # i.calculate()

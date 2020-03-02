@@ -18,12 +18,12 @@ import matplotlib.pyplot as plt
 import pyfftw
 
 # FFTW syntax
-a = pyfftw.empty_aligned((101,101),dtype='complex128')
-b = pyfftw.empty_aligned((101,101),dtype='complex128')
-fft_o = pyfftw.FFTW(a,b,axes=(0,1))
+a = pyfftw.empty_aligned((101, 101), dtype="complex128")
+b = pyfftw.empty_aligned((101, 101), dtype="complex128")
+fft_o = pyfftw.FFTW(a, b, axes=(0, 1))
 
-a[:] = np.zeros((101,101))
-a[40:60,40:60] = 1
+a[:] = np.zeros((101, 101))
+a[40:60, 40:60] = 1
 
 # kk = np.ones((101,101))*(-1)
 # kk[::2,::2] = 1
@@ -38,8 +38,3 @@ b[:] = np.fft.fftshift(b)
 plt.imshow(b.real)
 plt.colorbar()
 plt.show()
-
-
-
-
-

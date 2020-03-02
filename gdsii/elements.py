@@ -63,34 +63,27 @@ Additional definitions:
 from __future__ import absolute_import
 from . import exceptions, record, tags, _records
 
-__all__ = (
-    'Boundary',
-    'Path',
-    'SRef',
-    'ARef',
-    'Text',
-    'Node',
-    'Box'
-)
+__all__ = ("Boundary", "Path", "SRef", "ARef", "Text", "Node", "Box")
 
-_ELFLAGS = _records.OptionalWholeRecord('elflags', tags.ELFLAGS)
-_PLEX = _records.SimpleOptionalRecord('plex', tags.PLEX)
-_LAYER = _records.SimpleRecord('layer', tags.LAYER)
-_DATATYPE = _records.SimpleRecord('data_type', tags.DATATYPE)
-_PATHTYPE = _records.SimpleOptionalRecord('path_type', tags.PATHTYPE)
-_WIDTH = _records.SimpleOptionalRecord('width', tags.WIDTH)
-_BGNEXTN = _records.SimpleOptionalRecord('bgn_extn', tags.BGNEXTN)
-_ENDEXTN = _records.SimpleOptionalRecord('end_extn', tags.ENDEXTN)
-_XY = _records.XYRecord('xy', tags.XY)
-_SNAME = _records.StringRecord('struct_name', tags.SNAME)
-_STRANS = _records.STransRecord('strans', tags.STRANS)
-_COLROW = _records.ColRowRecord('cols', 'rows')
-_TEXTTYPE = _records.SimpleRecord('text_type', tags.TEXTTYPE)
-_PRESENTATION = _records.OptionalWholeRecord('presentation', tags.PRESENTATION)
-_STRING = _records.StringRecord('string', tags.STRING)
-_NODETYPE = _records.SimpleRecord('node_type', tags.NODETYPE)
-_BOXTYPE = _records.SimpleRecord('box_type', tags.BOXTYPE)
-_PROPERTIES = _records.PropertiesRecord('properties')
+_ELFLAGS = _records.OptionalWholeRecord("elflags", tags.ELFLAGS)
+_PLEX = _records.SimpleOptionalRecord("plex", tags.PLEX)
+_LAYER = _records.SimpleRecord("layer", tags.LAYER)
+_DATATYPE = _records.SimpleRecord("data_type", tags.DATATYPE)
+_PATHTYPE = _records.SimpleOptionalRecord("path_type", tags.PATHTYPE)
+_WIDTH = _records.SimpleOptionalRecord("width", tags.WIDTH)
+_BGNEXTN = _records.SimpleOptionalRecord("bgn_extn", tags.BGNEXTN)
+_ENDEXTN = _records.SimpleOptionalRecord("end_extn", tags.ENDEXTN)
+_XY = _records.XYRecord("xy", tags.XY)
+_SNAME = _records.StringRecord("struct_name", tags.SNAME)
+_STRANS = _records.STransRecord("strans", tags.STRANS)
+_COLROW = _records.ColRowRecord("cols", "rows")
+_TEXTTYPE = _records.SimpleRecord("text_type", tags.TEXTTYPE)
+_PRESENTATION = _records.OptionalWholeRecord("presentation", tags.PRESENTATION)
+_STRING = _records.StringRecord("string", tags.STRING)
+_NODETYPE = _records.SimpleRecord("node_type", tags.NODETYPE)
+_BOXTYPE = _records.SimpleRecord("box_type", tags.BOXTYPE)
+_PROPERTIES = _records.PropertiesRecord("properties")
+
 
 class _Base(object):
     """Base class for all GDSII elements."""
@@ -118,7 +111,7 @@ class _Base(object):
         """
         element_class = cls._tag_to_class_map[gen.current.tag]
         if not element_class:
-            raise exceptions.FormatError('unexpected element tag')
+            raise exceptions.FormatError("unexpected element tag")
         # do not call __init__() during reading from file
         # __init__() should require some arguments
         new_element = element_class._read_element(gen)
@@ -142,6 +135,7 @@ class _Base(object):
             obj.save(self, stream)
         record.Record(tags.ENDEL).save(stream)
 
+
 class Boundary(_Base):
     """
     Class for :const:`BOUNDARY` GDSII element.
@@ -157,9 +151,10 @@ class Boundary(_Base):
                      : [`properties`]
                      : ENDEL
     """
+
     _gds_tag = tags.BOUNDARY
     _gds_objs = (_ELFLAGS, _PLEX, _LAYER, _DATATYPE, _XY, _PROPERTIES)
-    __slots__ = ('layer', 'data_type', 'xy', 'elflags', 'plex', 'properties')
+    __slots__ = ("layer", "data_type", "xy", "elflags", "plex", "properties")
 
     def __init__(self, layer, data_type, xy):
         _Base.__init__(self)
@@ -171,6 +166,7 @@ class Boundary(_Base):
         self.elflags = None
         self.plex = None
         self.properties = None
+
 
 class Path(_Base):
     """
@@ -191,11 +187,32 @@ class Path(_Base):
                 : [`properties`]
                 : ENDEL
     """
+
     _gds_tag = tags.PATH
-    _gds_objs = (_ELFLAGS, _PLEX, _LAYER, _DATATYPE, _PATHTYPE, _WIDTH,
-            _BGNEXTN, _ENDEXTN, _XY, _PROPERTIES)
-    __slots__ = ('layer', 'data_type', 'xy', 'elflags', 'plex', 'path_type',
-            'width', 'bgn_extn', 'end_extn', 'properties')
+    _gds_objs = (
+        _ELFLAGS,
+        _PLEX,
+        _LAYER,
+        _DATATYPE,
+        _PATHTYPE,
+        _WIDTH,
+        _BGNEXTN,
+        _ENDEXTN,
+        _XY,
+        _PROPERTIES,
+    )
+    __slots__ = (
+        "layer",
+        "data_type",
+        "xy",
+        "elflags",
+        "plex",
+        "path_type",
+        "width",
+        "bgn_extn",
+        "end_extn",
+        "properties",
+    )
 
     def __init__(self, layer, data_type, xy):
         _Base.__init__(self)
@@ -212,6 +229,7 @@ class Path(_Base):
         self.end_extn = None
         self.properties = None
 
+
 class SRef(_Base):
     """
     Class for :const:`SREF` GDSII element.
@@ -227,10 +245,10 @@ class SRef(_Base):
                 : [`properties`]
                 : ENDEL
     """
+
     _gds_tag = tags.SREF
     _gds_objs = (_ELFLAGS, _PLEX, _SNAME, _STRANS, _XY, _PROPERTIES)
-    __slots__ = ('struct_name', 'xy', 'elflags', 'strans', 'mag', 'angle',
-            'properties')
+    __slots__ = ("struct_name", "xy", "elflags", "strans", "mag", "angle", "properties")
 
     def __init__(self, struct_name, xy):
         _Base.__init__(self)
@@ -243,6 +261,7 @@ class SRef(_Base):
         self.mag = None
         self.angle = None
         self.properties = None
+
 
 class ARef(_Base):
     """
@@ -260,10 +279,21 @@ class ARef(_Base):
                 : [`properties`]
                 : ENDEL
     """
+
     _gds_tag = tags.AREF
     _gds_objs = (_ELFLAGS, _PLEX, _SNAME, _STRANS, _COLROW, _XY, _PROPERTIES)
-    __slots__ = ('struct_name', 'cols', 'rows', 'xy', 'elflags', 'plex',
-            'strans', 'mag', 'angle', 'properties')
+    __slots__ = (
+        "struct_name",
+        "cols",
+        "rows",
+        "xy",
+        "elflags",
+        "plex",
+        "strans",
+        "mag",
+        "angle",
+        "properties",
+    )
 
     def __init__(self, struct_name, cols, rows, xy):
         _Base.__init__(self)
@@ -279,6 +309,7 @@ class ARef(_Base):
         self.mag = None
         self.angle = None
         self.properties = None
+
 
 class Text(_Base):
     """
@@ -300,12 +331,36 @@ class Text(_Base):
                 : [`properties`]
                 : ENDEL
     """
+
     _gds_tag = tags.TEXT
-    _gds_objs = (_ELFLAGS, _PLEX, _LAYER, _TEXTTYPE, _PRESENTATION, _PATHTYPE,
-            _WIDTH, _STRANS, _XY, _STRING, _PROPERTIES)
-    __slots__ = ('layer', 'text_type', 'xy', 'string', 'elflags', 'plex',
-            'presentation', 'path_type', 'width', 'strans', 'mag', 'angle',
-            'properties')
+    _gds_objs = (
+        _ELFLAGS,
+        _PLEX,
+        _LAYER,
+        _TEXTTYPE,
+        _PRESENTATION,
+        _PATHTYPE,
+        _WIDTH,
+        _STRANS,
+        _XY,
+        _STRING,
+        _PROPERTIES,
+    )
+    __slots__ = (
+        "layer",
+        "text_type",
+        "xy",
+        "string",
+        "elflags",
+        "plex",
+        "presentation",
+        "path_type",
+        "width",
+        "strans",
+        "mag",
+        "angle",
+        "properties",
+    )
 
     def __init__(self, layer, text_type, xy, string):
         _Base.__init__(self)
@@ -325,6 +380,7 @@ class Text(_Base):
         self.angle = None
         self.properties = None
 
+
 class Node(_Base):
     """
     Class for :const:`NODE` GDSII element.
@@ -340,9 +396,10 @@ class Node(_Base):
                 : [`properties`]
                 : ENDEL
     """
+
     _gds_tag = tags.NODE
     _gds_objs = (_ELFLAGS, _PLEX, _LAYER, _NODETYPE, _XY, _PROPERTIES)
-    __slots__ = ('layer', 'node_type', 'xy', 'elflags', 'plex', 'properties')
+    __slots__ = ("layer", "node_type", "xy", "elflags", "plex", "properties")
 
     def __init__(self, layer, node_type, xy):
         _Base.__init__(self)
@@ -354,6 +411,7 @@ class Node(_Base):
         self.elflags = None
         self.plex = None
         self.properties = None
+
 
 class Box(_Base):
     """
@@ -370,9 +428,10 @@ class Box(_Base):
                : [`properties`]
                : ENDEL
     """
+
     _gds_tag = tags.BOX
     _gds_objs = (_ELFLAGS, _PLEX, _LAYER, _BOXTYPE, _XY, _PROPERTIES)
-    __slots__ = ('layer', 'box_type', 'xy', 'elflags', 'plex', 'properties')
+    __slots__ = ("layer", "box_type", "xy", "elflags", "plex", "properties")
 
     def __init__(self, layer, box_type, xy):
         _Base.__init__(self)
@@ -385,6 +444,9 @@ class Box(_Base):
         self.plex = None
         self.properties = None
 
+
 _all_elements = (Boundary, Path, SRef, ARef, Text, Node, Box)
 
-_Base._tag_to_class_map = (lambda: dict(((cls._gds_tag, cls) for cls in _all_elements)))()
+_Base._tag_to_class_map = (
+    lambda: dict(((cls._gds_tag, cls) for cls in _all_elements))
+)()

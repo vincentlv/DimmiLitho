@@ -26,18 +26,19 @@ from __future__ import absolute_import
 from . import exceptions, record, structure, tags, _records
 from datetime import datetime
 
-_HEADER = _records.SimpleRecord('version', tags.HEADER)
-_BGNLIB = _records.TimestampsRecord('mod_time', 'acc_time', tags.BGNLIB)
-_LIBDIRSIZE = _records.SimpleOptionalRecord('libdirsize', tags.LIBDIRSIZE)
-_SRFNAME = _records.OptionalWholeRecord('srfname', tags.SRFNAME)
-_LIBSECUR = _records.ACLRecord('acls', tags.LIBSECUR)
-_LIBNAME = _records.StringRecord('name', tags.LIBNAME)
-_REFLIBS = _records.OptionalWholeRecord('reflibs', tags.REFLIBS)
-_FONTS = _records.OptionalWholeRecord('fonts', tags.FONTS)
-_ATTRTABLE = _records.OptionalWholeRecord('attrtable', tags.ATTRTABLE)
-_GENERATIONS = _records.SimpleOptionalRecord('generations', tags.GENERATIONS)
-_FORMAT = _records.FormatRecord('format', 'masks', tags.FORMAT)
-_UNITS = _records.UnitsRecord('logical_unit', 'physical_unit', tags.UNITS)
+_HEADER = _records.SimpleRecord("version", tags.HEADER)
+_BGNLIB = _records.TimestampsRecord("mod_time", "acc_time", tags.BGNLIB)
+_LIBDIRSIZE = _records.SimpleOptionalRecord("libdirsize", tags.LIBDIRSIZE)
+_SRFNAME = _records.OptionalWholeRecord("srfname", tags.SRFNAME)
+_LIBSECUR = _records.ACLRecord("acls", tags.LIBSECUR)
+_LIBNAME = _records.StringRecord("name", tags.LIBNAME)
+_REFLIBS = _records.OptionalWholeRecord("reflibs", tags.REFLIBS)
+_FONTS = _records.OptionalWholeRecord("fonts", tags.FONTS)
+_ATTRTABLE = _records.OptionalWholeRecord("attrtable", tags.ATTRTABLE)
+_GENERATIONS = _records.SimpleOptionalRecord("generations", tags.GENERATIONS)
+_FORMAT = _records.FormatRecord("format", "masks", tags.FORMAT)
+_UNITS = _records.UnitsRecord("logical_unit", "physical_unit", tags.UNITS)
+
 
 class Library(list):
     """
@@ -63,11 +64,25 @@ class Library(list):
             format: FORMAT
                   : [MASK+ ENDMASKS]
     """
-    _gds_objs = (_HEADER, _BGNLIB, _LIBDIRSIZE, _SRFNAME, _LIBSECUR, _LIBNAME, _REFLIBS,
-            _FONTS, _ATTRTABLE, _GENERATIONS, _FORMAT, _UNITS)
 
-    def __init__(self, version, name, physical_unit, logical_unit, mod_time=None,
-            acc_time=None):
+    _gds_objs = (
+        _HEADER,
+        _BGNLIB,
+        _LIBDIRSIZE,
+        _SRFNAME,
+        _LIBSECUR,
+        _LIBNAME,
+        _REFLIBS,
+        _FONTS,
+        _ATTRTABLE,
+        _GENERATIONS,
+        _FORMAT,
+        _UNITS,
+    )
+
+    def __init__(
+        self, version, name, physical_unit, logical_unit, mod_time=None, acc_time=None
+    ):
         """
         Initialize the library.
         `mod_time` and `acc_time` are set to current UTC time by default.
@@ -120,7 +135,9 @@ class Library(list):
             elif rec.tag == tags.ENDLIB:
                 break
             else:
-                raise exceptions.FormatError('unexpected tag where BGNSTR or ENDLIB are expected: %d', rec.tag)
+                raise exceptions.FormatError(
+                    "unexpected tag where BGNSTR or ENDLIB are expected: %d", rec.tag
+                )
         return self
 
     def save(self, stream):
@@ -136,4 +153,4 @@ class Library(list):
         record.Record(tags.ENDLIB).save(stream)
 
     def __repr__(self):
-        return '<Library: %s>' % self.name.decode()
+        return "<Library: %s>" % self.name.decode()
