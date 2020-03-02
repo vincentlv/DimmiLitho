@@ -24,10 +24,10 @@ class ILT:
         self.prepare()
 
     def prepare(self):
-        self.x1 = self.xsize / 2 - self.image.tcc.s.fnum
-        self.x2 = self.xsize / 2 + self.image.tcc.s.fnum + 1
-        self.y1 = self.ysize / 2 - self.image.tcc.s.gnum
-        self.y2 = self.ysize / 2 + self.image.tcc.s.gnum + 1
+        self.x1 = int(self.xsize / 2 - self.image.tcc.s.fnum)
+        self.x2 = int(self.xsize / 2 + self.image.tcc.s.fnum + 1)
+        self.y1 = int(self.ysize / 2 - self.image.tcc.s.gnum)
+        self.y2 = int(self.ysize / 2 + self.image.tcc.s.gnum + 1)
 
         self.spat_part = pyfftw.empty_aligned(
             (self.image.mask.y_gridnum, self.image.mask.x_gridnum), dtype="complex128"

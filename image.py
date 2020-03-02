@@ -43,9 +43,13 @@ class ImageHopkins:
             (self.mask.y_gridnum, self.mask.x_gridnum), dtype=np.complex128
         )
         AI_freq_sparse = np.zeros(
-            (self.y2 - self.y1, self.x2 - self.x1), dtype=np.complex128
+            (int(self.y2 - self.y1), int(self.x2 - self.x1)), dtype=np.complex128
         )
         for ii in range(self.order):
+            self.x1 = int(self.x1)
+            self.x2 = int(self.x2)
+            self.y1 = int(self.y1)
+            self.y2 = int(self.y2)
             e_field = (
                 self.kernels[:, :, ii]
                 * self.mask.fdata[self.y1 : self.y2, self.x1 : self.x2]
