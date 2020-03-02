@@ -8,7 +8,7 @@ NOTE: This is for Scalar Pupil Assumption, not Jones Pupil
 
 import numpy as np
 import copy
-from zernike import zerniken
+from litho.zernike import zerniken
 
 
 class Lens:

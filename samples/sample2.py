@@ -1,22 +1,23 @@
-"""
-Created on Wen Apr 27 2016
-@author: WenLv (wenlv@hust.edu.cn)
+""" inverse litho
+
+calculate needed mask to account for litho effects
 """
 
-from lens import LensList
-from tcc import TCCList
-from mask import Mask
-from source import Source
-from ilt import RobustILT
-
-import numpy as np
 import time
+import matplotlib.pyplot as plt
+
+from litho.config import CONFIG
+from litho.lens import LensList
+from litho.tcc import TCCList
+from litho.mask import Mask
+from litho.source import Source
+from litho.ilt import RobustILT
 
 
 m = Mask()
 m.x_gridsize = 2.5
 m.y_gridsize = 2.5
-m.openGDS("./NanGateLibGDS/NOR2_X2.gds", layername=11, boundary=0.3)
+m.openGDS(CONFIG["samples"] / "verniers.gds", layername=1, boundary=0.3)
 m.maskfft()
 
 
@@ -50,10 +51,18 @@ print("###taking %1.3f seconds" % (time.time() - tic))
 
 
 print("Calculating ILT")
+iterations = 20
 i = RobustILT(m, t)
 i.image.resist_a = 100
 i.image.resist_tRef = 0.9
 i.stepSize = 0.4
 i.image.doseList = [0.9, 1, 1.1]
 i.image.doseCoef = [0.3, 1, 0.3]
-i.run(100)
+i.run(iterations)
+
+plt.figure()
+plt.imshow(i.maskdata, origin='lower')
+
+plt.figure()
+plt.imshow(i.maskdata > 0.9, origin='lower')
+plt.show()

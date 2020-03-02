@@ -38,8 +38,6 @@ nosetests.xml
 .project
 .pydevproject
 notebooks/
-pp/gds/.gds/
-.gds/
 
 # General
 .DS_Store
@@ -131,9 +129,6 @@ Icon?
 *.wpu
 .pytest_cache
 
-# Fab-specific
-*.gds
-*.gds2
 
 # Random stuff
 .noseids

@@ -1,8 +1,14 @@
-from lens import LensList
-from tcc import TCCList
-from mask import Mask
-from source import Source
-from ilt import RobustILT
+"""
+Created on Wen Apr 27 2016
+@author: WenLv (wenlv@hust.edu.cn)
+"""
+
+from litho.lens import LensList
+from litho.tcc import TCCList
+from litho.mask import Mask
+from litho.source import Source
+from litho.ilt import RobustILT
+from litho.config import CONFIG
 
 import numpy as np
 import time
@@ -11,7 +17,10 @@ import time
 m = Mask()
 m.x_gridsize = 2.5
 m.y_gridsize = 2.5
-m.openGDS("verniers.gds", layername=1, boundary=0.3)
+
+gdspath = CONFIG["gdslib"] / "NOR2_X2.gds"
+
+m.openGDS(gdspath, layername=11, boundary=0.3)
 m.maskfft()
 
 
@@ -52,4 +61,4 @@ i.stepSize = 0.4
 i.image.doseList = [0.9, 1, 1.1]
 i.image.doseCoef = [0.3, 1, 0.3]
 i.run(1)
-
+# i.run(100)

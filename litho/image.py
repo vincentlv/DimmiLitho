@@ -131,10 +131,10 @@ class ImageHopkinsList(ImageHopkins):
 
 
 if __name__ == "__main__":
-    from tcc import TCCList, TCC
-    from mask import Mask
-    from source import Source
-    from lens import LensList, Lens
+    from litho.tcc import TCCList, TCC
+    from litho.mask import Mask
+    from litho.source import Source
+    from litho.lens import LensList, Lens
 
     mp = [
         [
@@ -201,6 +201,7 @@ if __name__ == "__main__":
 
     i = ImageHopkins(m, t)
     i.calAI()
+
 
     """robust ILT setting"""
     # s = Source()

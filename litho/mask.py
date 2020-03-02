@@ -5,14 +5,14 @@ Created on Sta Jun 28 2015
 Note: Binary Mask
 """
 
-import numpy as np
 import math
+import numpy as np
+import matplotlib.pyplot as plt
 import scipy.signal as sg
 import pyfftw
-
-"""This Libarary is Used Only for Polygon Data Processing
-"""
 from PIL import Image, ImageDraw
+
+from litho.config import CONFIG
 
 
 class Mask:
@@ -160,10 +160,9 @@ if __name__ == "__main__":
     m.y_range = [-300.0, 300.0]
     m.x_gridsize = 10
     m.y_gridsize = 10
-    m.openGDS("./NanGateLibGDS/AND2_X4.gds", 10)
+    m.openGDS(CONFIG['gdslib'] / "AND2_X4.gds", 10)
     m.maskfft()
 
-    import matplotlib.pyplot as plt
 
     plt.imshow(
         m.data,
@@ -171,5 +170,5 @@ if __name__ == "__main__":
         cmap="hot",
         interpolation="none",
     )
-    plt.show()
     # m.smooth()
+    plt.show()

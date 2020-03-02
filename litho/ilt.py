@@ -3,15 +3,17 @@ Created on Sta Jun 28 2015
 @author: WenLv (wenlv@hust.edu.cn)
 """
 
-import numpy as np
-from image import ImageHopkins, ImageHopkinsList
-import math
-import scipy.signal as sg
 import copy
+import math
+import numpy as np
+import scipy.signal as sg
 import pyfftw
+from litho.image import ImageHopkins, ImageHopkinsList
 
 
 class ILT:
+    """ inverse litho
+    """
     def __init__(self, m, t):
         self.image = ImageHopkins(m, t)
         self.xsize = self.image.mask.x_gridnum
@@ -261,11 +263,12 @@ class RobustILT(ILT):
 
 if __name__ == "__main__":
 
-    from lens import LensList
-    from tcc import TCCList
-    from mask import Mask
-    from source import Source
     import time
+    from litho.lens import LensList
+    from litho.tcc import TCCList
+    from litho.mask import Mask
+    from litho.source import Source
+    from litho.config import CONFIG
 
     a = time.time()
     m = Mask()
@@ -273,7 +276,7 @@ if __name__ == "__main__":
     m.y_range = [-300.0, 300.0]
     m.x_gridsize = 2.5
     m.y_gridsize = 2.5
-    m.openGDS("./NanGateLibGDS/NOR2_X2.gds", 11, 0.3)
+    m.openGDS(CONFIG['gdslib'] / "NOR2_X2.gds", 11, 0.3)
     m.maskfft()
 
     s = Source()
