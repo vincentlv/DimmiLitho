@@ -1,3 +1,6 @@
 hiyapyco
 gdsfactory
+pillow
+numpy
+matplotlib
 pyfftw

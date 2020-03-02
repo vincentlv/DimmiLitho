@@ -5,6 +5,8 @@
 *.ports
 *.properties
 
+Pipfile.lock
+
 # Packages
 *.egg
 *.egg-info
