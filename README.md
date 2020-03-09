@@ -1,5 +1,5 @@
 # DimmiLitho
-Include pixel-based mask synthesis, imaging model for optical lithography in Python. This is a simplified package, maybe OUT-OF-DATA.
+Include pixel-based mask synthesis, imaging model for optical lithography in Python. This is a simplified package, maybe OUT-OF-DATE.
 
 #USAGE:
 1. These files base on PIL, Numpy, Sci, pyFFTW packages. GDSii package is already included
