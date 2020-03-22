@@ -5,14 +5,12 @@ Created on Sta Jun 28 2015
 Note: Binary Mask
 """
 
-import math
-import numpy as np
 import matplotlib.pyplot as plt
-import scipy.signal as sg
+import numpy as np
 import pyfftw
-from PIL import Image, ImageDraw
-
+import scipy.signal as sg
 from litho.config import CONFIG
+from PIL import Image, ImageDraw
 
 
 class Mask:
@@ -160,9 +158,8 @@ if __name__ == "__main__":
     m.y_range = [-300.0, 300.0]
     m.x_gridsize = 10
     m.y_gridsize = 10
-    m.openGDS(CONFIG['gdslib'] / "AND2_X4.gds", 10)
+    m.openGDS(CONFIG["gdslib"] / "AND2_X4.gds", 10)
     m.maskfft()
-
 
     plt.imshow(
         m.data,

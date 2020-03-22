@@ -8,8 +8,8 @@ NOTE: This is for Scalar Assumption, not Vector
 """
 
 import numpy as np
-import scipy.signal as sg
 import pyfftw
+import scipy.signal as sg
 
 
 class ImageHopkins:
@@ -131,10 +131,10 @@ class ImageHopkinsList(ImageHopkins):
 
 
 if __name__ == "__main__":
-    from litho.tcc import TCCList, TCC
+    from litho.tcc import TCC
     from litho.mask import Mask
     from litho.source import Source
-    from litho.lens import LensList, Lens
+    from litho.lens import Lens
 
     mp = [
         [
@@ -202,8 +202,10 @@ if __name__ == "__main__":
     i = ImageHopkins(m, t)
     i.calAI()
 
-
     """robust ILT setting"""
+    # from litho.lens import LensList
+    # from litho.tcc import TCCList
+
     # s = Source()
     # s.na = 1.25
     # s.maskxpitch = 600.0
