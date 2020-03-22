@@ -1,6 +1,7 @@
 
+
 ```eval_rst
-.. automodule:: dimmilitho
+.. automodule:: litho
     :members:
 
 

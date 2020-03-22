@@ -4,4 +4,4 @@ dimmilitho
 Config
 ---------------------
 
-.. automodule:: dimmilitho.config
+.. automodule:: litho.config
