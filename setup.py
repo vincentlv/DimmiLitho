@@ -2,8 +2,7 @@ import io
 import os
 import re
 
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 def read(filename):
@@ -20,7 +19,7 @@ def get_install_requires():
 
 setup(
     name="dimmilitho",
-    version="0.0.1",
+    version="0.0.2",
     url="https://github.com/joamatab/dimmilitho",
     license="MIT",
     author="vincentlv",

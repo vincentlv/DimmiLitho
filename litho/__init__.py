@@ -6,7 +6,7 @@ from litho.mask import Mask
 from pp.rotate import rotate
 from skimage.measure import find_contours
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __author__ = "vincentlv <vicentlv>"
 __all__ = ["CONFIG", "Mask"]
 

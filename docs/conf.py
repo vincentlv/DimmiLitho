@@ -2,7 +2,7 @@ from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
 project = "dimmilitho"
-version = "0.0.1"
+version = "0.0.2"
 copyright = "2019, vincentlv"
 author = "vincentlv"
 
