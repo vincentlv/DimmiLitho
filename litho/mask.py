@@ -10,6 +10,7 @@ import numpy as np
 import pyfftw
 import scipy.signal as sg
 from litho.config import CONFIG
+from litho.gdsii.library import Library
 from PIL import Image, ImageDraw
 
 
@@ -58,8 +59,6 @@ class Mask:
         self.fft_mask = pyfftw.FFTW(self.spat_part, self.freq_part, axes=(0, 1))
 
     def openGDS(self, gdsdir, layername, boundary=0.16, scalerate=45 / 70.0):
-
-        from gdsii.library import Library
 
         with open(gdsdir, "rb") as stream:
             lib = Library.load(stream)
