@@ -1,4 +1,4 @@
-# DimmiLitho
+# DimmiLitho 0.0.1
 
 Includes pixel-based mask synthesis, imaging model for optical lithography in Python. This is a simplified package, maybe OUT-OF-DATE.
 
