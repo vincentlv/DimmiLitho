@@ -1,6 +1,6 @@
 # DimmiLitho
 
-Include pixel-based mask synthesis, imaging model for optical lithography in Python. This is a simplified package, maybe OUT-OF-DATA.
+Includes pixel-based mask synthesis, imaging model for optical lithography in Python. This is a simplified package, maybe OUT-OF-DATE.
 
 # USAGE
 
