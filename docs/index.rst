@@ -5,7 +5,11 @@ dimmilitho
 .. toctree::
     :maxdepth: 2
 
-    markdown
-    rst
-
-
+    ilt
+    image
+    lens
+    mask
+    source
+    tcc
+    zernike
+    smooth

@@ -1,10 +1,9 @@
 import numpy as np
 import pp
-from pp.rotate import rotate
 
 
 @pp.autoname
-def verniers_width(width_min=0.1, width_max=0.5, gap=0.1, size_max=11):
+def verniers(width_min=0.1, width_max=0.5, gap=0.1, size_max=11):
     c = pp.Component()
     y = 0
 
@@ -14,13 +13,14 @@ def verniers_width(width_min=0.1, width_max=0.5, gap=0.1, size_max=11):
         w = c << pp.c.waveguide(width=width, length=size_max)
         y += width / 2
         w.y = y
+        c.add(pp.c.label(str(int(width * 1e3)), position=(0, y)))
         y += width / 2 + gap
 
     return c
 
 
 if __name__ == "__main__":
-    c = verniers_width()
+    c = verniers()
     c.flatten()
-    pp.write_gds(c, 'verniers.gds')
+    pp.write_gds(c, "verniers.gds")
     pp.show(c)

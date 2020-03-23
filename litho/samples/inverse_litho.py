@@ -4,22 +4,20 @@ calculate needed mask to account for litho effects
 """
 
 import time
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
 from litho.config import CONFIG
+from litho.ilt import RobustILT
 from litho.lens import LensList
-from litho.tcc import TCCList
 from litho.mask import Mask
 from litho.source import Source
-from litho.ilt import RobustILT
-
+from litho.tcc import TCCList
 
 m = Mask()
 m.x_gridsize = 2.5
 m.y_gridsize = 2.5
 m.openGDS(CONFIG["samples"] / "verniers.gds", layername=1, boundary=0.3)
 m.maskfft()
-
 
 s = Source()
 s.na = 1.35
@@ -32,7 +30,6 @@ s.smooth_deta = 0.00
 s.shiftAngle = 0
 s.update()
 s.ifft()
-
 
 o = LensList()
 o.na = s.na
@@ -61,8 +58,8 @@ i.image.doseCoef = [0.3, 1, 0.3]
 i.run(iterations)
 
 plt.figure()
-plt.imshow(i.maskdata, origin='lower')
+plt.imshow(i.maskdata, origin="lower")
 
 plt.figure()
-plt.imshow(i.maskdata > 0.9, origin='lower')
+plt.imshow(i.maskdata > 0.9, origin="lower")
 plt.show()

@@ -1,11 +1,11 @@
 """
-Created on Mon Dec 29 2014
-@author: WenLv (wenlv@hust.edu.cn)
+
 """
+
+import math
 
 import numpy as np
 from scipy.special import erf
-import math
 
 
 def Edeta(deta, x):
@@ -18,25 +18,37 @@ def Edeta(deta, x):
         return g
 
 
-"""NOTE:
-   Source.data is used for Abbe fomulation
-   Source.mdata is used for Hopkins fomulation, Mutual Intensity, TCC calculation
-"""
-
-
 class Source:
-    def __init__(self):
-        self.na = 1.35
-        self.wavelength = 193.0
-        self.maskxpitch = 2000.0
-        self.maskypitch = 2000.0
+    """
+    Source.data is used for Abbe fomulation
+    Source.mdata is used for Hopkins fomulation, Mutual Intensity, TCC calculation
 
-        self.sigma_out = 0.8
-        self.sigma_in = 0.6
-        self.smooth_deta = 0.03
-        self.shiftAngle = math.pi / 4
-        self.openAngle = math.pi / 16
-        self.type = "annular"
+    """
+
+    def __init__(
+        self,
+        na=1.35,
+        wavelength=193.0,
+        maskxpitch=2000.0,
+        maskypitch=2000.0,
+        sigma_out=0.8,
+        sigma_in=0.6,
+        smooth_deta=0.03,
+        shiftAngle=math.pi / 4,
+        openAngle=math.pi / 16,
+        source_type="annular",
+    ):
+        self.na = na
+        self.wavelength = wavelength
+        self.maskxpitch = maskxpitch
+        self.maskypitch = maskypitch
+
+        self.sigma_out = sigma_out
+        self.sigma_in = sigma_in
+        self.smooth_deta = smooth_deta
+        self.shiftAngle = shiftAngle
+        self.openAngle = openAngle
+        self.type = source_type
 
     def update(self):
         self.detaf = self.wavelength / (self.maskxpitch * self.na)

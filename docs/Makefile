@@ -22,4 +22,7 @@ upload:
 open:
 	open build/html/index.html
 
+install:
+	pip install -r requirements.txt
+
 see: html open

@@ -1,18 +1,16 @@
 """
-Created on Sta Jun 28 2015
-@author: WenLv (wenlv@hust.edu.cn)
 """
 import numpy as np
-import scipy as sci
 import pyfftw
-
-from litho.source import Source
+import scipy as sci
 from litho.lens import LensList
+from litho.source import Source
 
 
 class TCC:
     """
     """
+
     def __init__(self, source, lens):
         self.s = source
         self.s.update()

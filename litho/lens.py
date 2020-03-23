@@ -6,19 +6,40 @@ NOTE: This is for Scalar Pupil Assumption, not Jones Pupil
       LensList is a Lens container, used for, e.g., robust mask synthesis
 """
 
-import numpy as np
 import copy
+
+import numpy as np
 from litho.zernike import zerniken
 
 
 class Lens:
-    def __init__(self):
-        self.na = 1.35
-        self.nLiquid = 1.414
-        self.wavelength = 193.0  # nm
-        self.defocus = 0.0  # nm
-        self.maskxpitch = 1000  # nm
-        self.maskypitch = 1000
+    """ Model lens
+
+    Args:
+        na : 1.35
+        nLiquid : 1.414
+        wavelength (nm) : 193.0
+        defocus (nm) : 0.0
+        maskxpitch (nm): 1000
+        maskypitch (nm): 1000
+
+    """
+
+    def __init__(
+        self,
+        na=1.35,
+        nLiquid=1.414,
+        wavelength=193.0,
+        defocus=0.0,
+        maskxpitch=1000,
+        maskypitch=1000,
+    ):
+        self.na = na
+        self.nLiquid = nLiquid
+        self.wavelength = wavelength
+        self.defocus = defocus
+        self.maskxpitch = maskxpitch
+        self.maskypitch = maskypitch
         self.Zn = [9]
         self.Cn = [0.0]
 
@@ -66,6 +87,10 @@ class Lens:
 
 
 class LensList(Lens):
+    """
+    List of lens
+    """
+
     def __init__(self):
         Lens.__init__(self)
         self.focusList = [0.0]

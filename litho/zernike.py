@@ -1,10 +1,9 @@
 """
-Created on Mon May 19 13:30:30 2014
-@author: WenLv
 """
 
 from math import factorial
-from numpy import meshgrid, sqrt, arctan2, zeros, cos, sin, array, where, linspace
+
+from numpy import arctan2, array, cos, linspace, meshgrid, sin, sqrt, where, zeros
 
 
 def polar_array(T, num):
@@ -42,15 +41,15 @@ def rnm(n, m, rho):
 
 def zernike(n, m, rho, theta):
     """
-    **ARGUMENTS:** 
-    
-    ===== ==========================================     
+    **ARGUMENTS:**
+
+    ===== ==========================================
     n     n order of the Zernike polynomial
     m     m order of the spatial frequency
-    rho   Matrix containing the radial coordinates. 
+    rho   Matrix containing the radial coordinates.
     theta Matrix containing the angular coordinates.
     ===== ==========================================
- 
+
     """
     Rnm = rnm(n, m, rho)
     Nnm = sqrt(2 * (n + 1) / (1 + where(m == 0, 1, 0)))
@@ -66,7 +65,7 @@ def zernike(n, m, rho, theta):
 def i2nm(i):
     """
     Return the n and m orders of the i'th zernike polynomial
-       
+
     ========= == == == == == == == == == == == == == == == ===
     i          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 ...
     n-order    0  1  1  2  2  2  3  3  3  3  4  4  4  4  4 ...

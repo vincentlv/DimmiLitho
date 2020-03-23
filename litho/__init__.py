@@ -8,7 +8,7 @@ from skimage.measure import find_contours
 
 __version__ = "0.0.2"
 __author__ = "vincentlv <vicentlv>"
-__all__ = ["CONFIG", "Mask"]
+__all__ = ["CONFIG", "Mask", "smooth"]
 
 
 def smooth(
@@ -32,19 +32,63 @@ def smooth(
         xmax:
         ymax:
         gridsize: 10
-        layer: 1
+        layer_in: 1
+        layer_out: 1
+        scale_factor: 1
+        angle: in degrees -90
 
-    Mask Default Parameters
-    1. x/y_range means the computing area. Different value are supported
-    2. x/y_gridsize the simulated size of the area. Different value are supported
-    3. CD infomation is usable for method poly2mask
+    .. plot::
+        :include-source:
+
+        import pp
+        from litho.samples.verniers import verniers
+
+        c = verniers()
+        c.x = 0
+        c.y = 0
+        pp.plotgds(c)
+
+
+    .. plot::
+        :include-source:
+
+        import pp
+        from litho import CONFIG
+        from litho import smooth
+        from litho import overlay
+
+        gdspathin = CONFIG["samples"] / "verniers.gds"
+        gdspathout = CONFIG["samples"] / "verniers_out.gds"
+
+        layer = 1
+        threshold = 0.35
+        ymax = xmax = 600
+        gridsize = 1
+        scale_factor = 20 * 23 / 7.1
+        angle = 90
+
+        c = smooth(
+            gdspathin,
+            gdspathout,
+            threshold=threshold,
+            xmax=xmax,
+            ymax=ymax,
+            gridsize=gridsize,
+            scale_factor=scale_factor,
+            layer_in=layer,
+            layer_out=2,
+            angle=angle,
+        )
+
+        pp.plotgds(gdspathout)
+
     """
     m = Mask()
     m.x_range = [-xmax, xmax]
     m.y_range = [-ymax, ymax]
     m.x_gridsize = gridsize
     m.y_gridsize = gridsize
-    m.openGDS(gdspathin, layer_in)
+    m.openGDS(str(gdspathin), layer_in)
     m.maskfft()
 
     m.smooth()
@@ -60,6 +104,8 @@ def smooth(
         c.add_polygon(ci / gridsize ** 2 / scale_factor, layer=layer_out)
 
     cr = rotate(c, angle=angle)
+    cr.x = 0
+    cr.y = 0
     pp.write_gds(cr, gdspathout)
     return cr
 
@@ -67,6 +113,7 @@ def smooth(
 def overlay(gdspathin, gdspathout):
     c = pp.Component()
     ci = pp.import_gds(gdspathin)
+
     co = pp.import_gds(gdspathout)
     cir = c << ci
     cor = c << co
@@ -82,6 +129,42 @@ def overlay(gdspathin, gdspathout):
     return c
 
 
+def _demo_and():
+    gdspathin = CONFIG["gdslib"] / "AND2_X4.gds"
+    gdspathout = CONFIG["gdslib"] / "AND2_X4_smooth.gds"
+    layer = 10
+    threshold = 0.4
+    ymax = xmax = 600
+    gridsize = 5  # smaller features
+    gridsize = 10
+    scale_factor = 1
+    angle = -90
+
+    c = smooth(
+        gdspathin,
+        gdspathout,
+        threshold=threshold,
+        xmax=xmax,
+        ymax=ymax,
+        gridsize=gridsize,
+        scale_factor=scale_factor,
+        layer_in=layer,
+        layer_out=2,
+        angle=angle,
+    )
+    c = overlay(gdspathin, gdspathout)
+
+    # pp.show(gdspathin)
+    pp.show(c)
+
+
+def _remap_and():
+    gdspathin = CONFIG["gdslib"] / "AND2_X4.gds"
+    ci = pp.import_gds(gdspathin)
+    ci = ci.remove_layers([1, 2, 3, 4, 5, 9, 11, (63, 63), 235])
+    pp.write_gds(ci, "and2.gds")
+
+
 if __name__ == "__main__":
     gdspathin = CONFIG["samples"] / "verniers.gds"
     gdspathout = CONFIG["samples"] / "verniers_out.gds"
@@ -92,8 +175,8 @@ if __name__ == "__main__":
     scale_factor = 20 * 23 / 7.1
     angle = 90
 
-    # gdspathin = CONFIG["gdslib"] / "AND2_X4.gds"
-    # gdspathout = CONFIG["gdslib"] / "AND2_X4_smooth.gds"
+    # gdspathin = CONFIG["samples"] / "and2.gds"
+    # gdspathout = CONFIG["gdslib"] / "and2_smooth.gds"
     # layer = 10
     # threshold = 0.4
     # ymax = xmax = 600
@@ -110,7 +193,7 @@ if __name__ == "__main__":
         ymax=ymax,
         gridsize=gridsize,
         scale_factor=scale_factor,
-        layer_in=1,
+        layer_in=layer,
         layer_out=2,
         angle=angle,
     )
@@ -118,6 +201,7 @@ if __name__ == "__main__":
 
     # pp.show(gdspathin)
     pp.show(c)
+    pp.plotgds(c)
 
     # import pp
     # pp.show(gdspathout)

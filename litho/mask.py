@@ -1,10 +1,3 @@
-"""
-Created on Sta Jun 28 2015
-@author: WenLv (wenlv@hust.edu.cn)
-
-Note: Binary Mask
-"""
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pyfftw
@@ -15,17 +8,55 @@ from PIL import Image, ImageDraw
 
 
 class Mask:
-    def __init__(self):
-        """Default Parameters
-           1. x/y_range means the computing area. Different value are supported
-           2. x/y_gridsize the simulated size of the area. Different value are supported
-           3. CD infomation is usable for method poly2mask
-        """
-        self.x_range = [-500, 500]  # nm
-        self.y_range = [-500, 500]
-        self.x_gridsize = 2  # nm
-        self.y_gridsize = 2
-        self.CD = 45  # nm
+    """
+
+    Binary Mask
+
+    Args:
+        x/ymax: for the computing area
+        x/y_gridsize: the simulated size of the area. Different value are supported. 2nm
+        CD: used for method poly2mask, 45nm
+
+    .. plot::
+       :include-source:
+
+        import matplotlib.pyplot as plt
+
+        from litho.config import CONFIG
+        from litho.mask import Mask
+
+        m = Mask()
+        m.x_range = [-300.0, 300.0]
+        m.y_range = [-300.0, 300.0]
+        m.x_gridsize = 10
+        m.y_gridsize = 10
+        m.openGDS(CONFIG["gdslib"] / "AND2_X4.gds", 10)
+        m.maskfft()
+        m.smooth()
+
+        plt.imshow(
+            m.data,
+            extent=(m.x_range[0], m.x_range[1], m.y_range[0], m.y_range[1]),
+            cmap="hot",
+            interpolation="none",
+        )
+        plt.figure()
+        plt.imshow(
+            m.sdata,
+            extent=(m.x_range[0], m.x_range[1], m.y_range[0], m.y_range[1]),
+            cmap="hot",
+            interpolation="none",
+        )
+        plt.show()
+
+    """
+
+    def __init__(self, xmax=500, ymax=500, x_gridsize=2, y_gridsize=2, CD=45):
+        self.x_range = [-xmax, xmax]  # nm
+        self.y_range = [-ymax, ymax]
+        self.x_gridsize = x_gridsize  # nm
+        self.y_gridsize = y_gridsize
+        self.CD = CD
 
     def poly2mask(self):
         """Get Pixel-based Mask Image from Polygon Data
@@ -159,6 +190,7 @@ if __name__ == "__main__":
     m.y_gridsize = 10
     m.openGDS(CONFIG["gdslib"] / "AND2_X4.gds", 10)
     m.maskfft()
+    m.smooth()
 
     plt.imshow(
         m.data,
@@ -166,5 +198,11 @@ if __name__ == "__main__":
         cmap="hot",
         interpolation="none",
     )
-    # m.smooth()
+    plt.figure()
+    plt.imshow(
+        m.sdata,
+        extent=(m.x_range[0], m.x_range[1], m.y_range[0], m.y_range[1]),
+        cmap="hot",
+        interpolation="none",
+    )
     plt.show()

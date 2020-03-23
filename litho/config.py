@@ -9,10 +9,10 @@ loads a configuration from 3 files, high priority overwrites low priority:
 
 __all__ = ["CONFIG"]
 
-import pathlib
 import logging
-import hiyapyco
+import pathlib
 
+import hiyapyco
 
 default_config = """
 keySample: valueSample
@@ -32,10 +32,11 @@ CONFIG = hiyapyco.load(
     failonmissingfiles=False,
     loglevelmissingfiles=logging.DEBUG,
 )
-CONFIG["root"] = cwd
-CONFIG["repo"] = cwd.parent
+
+CONFIG["module_path"] = module_path
+CONFIG["repo_path"] = repo_path
 CONFIG["gdslib"] = repo_path / "gdslib"
-CONFIG["samples"] = repo_path / "samples"
+CONFIG["samples"] = module_path / "samples"
 
 
 if __name__ == "__main__":

@@ -9,12 +9,12 @@ We need PRE-PROCESS the matrix BEFORE and AFTER fftw, because unless
 Here are some tricks:
 1) One way is using fftshift both before and after. Adopted here!
 2) Maybe, put a(i,j) = a(i,j)*(-1)^(j+k) will center the zero freqency
-   without need of fftshift, faster but with sacrificing accuracy slightly. 
+   without need of fftshift, faster but with sacrificing accuracy slightly.
 
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import pyfftw
 
 # FFTW syntax

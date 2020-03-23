@@ -4,8 +4,8 @@ calculates litho effects
 """
 
 import matplotlib.pyplot as plt
-from litho.mask import Mask
 from litho.config import CONFIG
+from litho.mask import Mask
 
 """polygon 2 mask"""
 # mp = [ [[-1,6],[-1, 2],[1, 2],[1, 1],[6, 1],[6, 0],[0, 0],[0, 1],[-2, 1],[-2, 6],[-1, 6]], \

@@ -1,10 +1,5 @@
 """
-Created on Sta Jun 28 2015
-@author: WenLv (wenlv@hust.edu.cn)
 
-NOTE: This is for Scalar Assumption, not Vector
-      This is for Hopkins
-      ImageHopkinsList is a container, used for, e.g., robust mask synthesis
 """
 
 import numpy as np
@@ -13,6 +8,10 @@ import scipy.signal as sg
 
 
 class ImageHopkins:
+    """ ImageHopkinsList is a container, used for, e.g., robust mask synthesis
+    This is for Scalar Assumption, not Vector
+    """
+
     def __init__(self, mask, tcc):
         self.tcc = tcc  # TCC
         self.mask = mask  # Mask
