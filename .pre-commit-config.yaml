@@ -5,17 +5,24 @@ repos:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
-  - repo: https://github.com/pre-commit/mirrors-isort
-    rev: '' # Use the revision sha / tag you want to point at
+
+  - repo: https://github.com/asottile/reorder_python_imports
+    rev: ''
     hooks:
-      - id: isort
+      - id: reorder-python-imports
 
   - repo: https://github.com/psf/black
     rev: ''
     hooks:
       - id: black
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: ''
     hooks:
       - id: flake8
+
+  - repo: https://github.com/kynan/nbstripout
+    rev: master
+    hooks:
+      - id: nbstripout
+        files: '.ipynb'
