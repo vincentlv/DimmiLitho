@@ -2,7 +2,8 @@ import io
 import os
 import re
 
-from setuptools import find_packages, setup
+from setuptools import find_packages
+from setuptools import setup
 
 
 def read(filename):
@@ -23,7 +24,6 @@ setup(
     url="https://github.com/joamatab/dimmilitho",
     license="MIT",
     author="vincentlv",
-    author_email="vicentlv",
     description="litho simulation",
     long_description=read("README.md"),
     packages=find_packages(exclude=("tests",)),
