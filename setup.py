@@ -12,7 +12,7 @@ def get_install_requires():
 
 
 setup(
-    name="dimmilitho",
+    name="litho",
     version="0.0.2",
     url="https://github.com/joamatab/dimmilitho",
     license="MIT",
