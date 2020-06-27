@@ -2,9 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pyfftw
 import scipy.signal as sg
+from PIL import Image
+from PIL import ImageDraw
+
 from litho.config import CONFIG
 from litho.gdsii.library import Library
-from PIL import Image, ImageDraw
 
 
 class Mask:
