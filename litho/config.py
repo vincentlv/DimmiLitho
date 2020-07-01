@@ -38,6 +38,7 @@ CONFIG["repo_path"] = repo_path
 CONFIG["gdslib"] = repo_path / "gdslib"
 CONFIG["samples"] = module_path / "samples"
 
+CONFIG["scalerate"] = 45 / 70
 
 if __name__ == "__main__":
     print(CONFIG["repo"])

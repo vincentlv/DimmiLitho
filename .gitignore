@@ -23,6 +23,7 @@ lib64
 __pycache__
 .mypy_cache/
 .pyre/
+extra/
 
 # Installer logs
 pip-log.txt

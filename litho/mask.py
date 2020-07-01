@@ -53,7 +53,7 @@ class Mask:
 
     """
 
-    def __init__(self, xmax=500, ymax=500, x_gridsize=2, y_gridsize=2, CD=45):
+    def __init__(self, xmax=500, ymax=500, x_gridsize=1, y_gridsize=1, CD=45):
         self.x_range = [-xmax, xmax]  # nm
         self.y_range = [-ymax, ymax]
         self.x_gridsize = x_gridsize  # nm
@@ -91,7 +91,9 @@ class Mask:
         )
         self.fft_mask = pyfftw.FFTW(self.spat_part, self.freq_part, axes=(0, 1))
 
-    def openGDS(self, gdsdir, layername, boundary=0.16, scalerate=45 / 70.0):
+    def openGDS(
+        self, gdsdir, layername, boundary=0.16, pixels_per_um=10, with_fft=False
+    ):
 
         with open(gdsdir, "rb") as stream:
             lib = Library.load(stream)
@@ -106,7 +108,7 @@ class Mask:
             if a[ii].layer == layername:
                 # if hasattr(a[ii],'data_type'):
                 if len(a[ii].xy) > 1:
-                    aa = np.array(a[ii].xy) / 10.0 * scalerate
+                    aa = np.array(a[ii].xy) / 1000 * pixels_per_um
                     b.append(aa)
                     xmin.append(min([k for k, v in aa]))
                     xmax.append(max([k for k, v in aa]))
@@ -144,7 +146,8 @@ class Mask:
             self.perimeter += np.sum(np.abs(pp[0:-1] - pp[1:polygonlen]))
 
         self.data = np.array(img)
-        # Creat fourier transform pair, pyfftw syntax
+
+        # Fourier transform pair, pyfftw syntax
         self.spat_part = pyfftw.empty_aligned(
             (self.y_gridnum, self.x_gridnum), dtype="complex128"
         )
