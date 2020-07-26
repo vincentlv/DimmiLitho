@@ -1,0 +1,7 @@
+hiyapyco
+gdsfactory
+pillow
+numpy
+matplotlib
+pyfftw
+scikit-image
