@@ -318,7 +318,11 @@ class RobustILT(ILT):
             self.calRegTerm()
             self.updateThetaConstSize()
             print(
-                "Interation index: %d, Costfunction value: %4f." % (ii, self.error[ii],)
+                "Interation index: %d, Costfunction value: %4f."
+                % (
+                    ii,
+                    self.error[ii],
+                )
             )
 
 

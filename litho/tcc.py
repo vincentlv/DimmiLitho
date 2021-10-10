@@ -9,8 +9,7 @@ from litho.source import Source
 
 
 class TCC:
-    """
-    """
+    """ """
 
     def __init__(self, source, lens):
         self.s = source

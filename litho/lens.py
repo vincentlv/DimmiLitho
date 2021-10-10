@@ -14,7 +14,7 @@ from litho.zernike import zerniken
 
 
 class Lens:
-    """ Model lens
+    """Model lens
 
     Args:
         na : 1.35

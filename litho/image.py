@@ -8,7 +8,7 @@ import scipy.signal as sg
 
 
 class ImageHopkins:
-    """ ImageHopkinsList is a container, used for, e.g., robust mask synthesis
+    """ImageHopkinsList is a container, used for, e.g., robust mask synthesis
     This is for Scalar Assumption, not Vector
     """
 
