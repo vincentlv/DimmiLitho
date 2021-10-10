@@ -1,5 +1,5 @@
 pillow==8.3.2
 numpy
 matplotlib
-pyfftw==0.12.0
+pyFFTW
 scikit-image
