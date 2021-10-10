@@ -5,6 +5,10 @@ litho
 .. toctree::
     :maxdepth: 2
 
-    README
-    markdown
-    rst
+    ilt
+    image
+    lens
+    mask
+    source
+    tcc
+    zernike
