@@ -1,0 +1,45 @@
+repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: ""
+      hooks:
+          - id: check-yaml
+          - id: end-of-file-fixer
+          - id: trailing-whitespace
+
+    - repo: https://github.com/hakancelik96/unimport
+      rev: stable
+      hooks:
+          - id: unimport
+            args: [--remove, --include-star-import]
+    - repo: https://github.com/pycqa/isort
+      rev: ""
+      hooks:
+          - id: isort
+            files: "litho/.*"
+            args: ["--profile", "black", "--filter-files"]
+
+    - repo: https://github.com/psf/black
+      rev: ""
+      hooks:
+          - id: black
+
+    - repo: https://gitlab.com/pycqa/flake8
+      rev: ""
+      hooks:
+          - id: flake8
+
+    - repo: https://github.com/kynan/nbstripout
+      rev: master
+      hooks:
+          - id: nbstripout
+            files: ".ipynb"
+
+    # - repo: https://github.com/pre-commit/mirrors-mypy
+    #   rev: ""
+    #   hooks:
+    #       - id: mypy
+    #         exclude: ^(docs/|example-plugin/|tests/fixtures)
+    # - repo: https://github.com/pycqa/pydocstyle
+    #   rev: ""
+    #   hooks:
+    #       - id: pydocstyle
